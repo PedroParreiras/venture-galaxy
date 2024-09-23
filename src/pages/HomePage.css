@@ -157,6 +157,18 @@
     padding: 20px 30px;
     text-align: center;
   }
+
+  .pdf-viewer {
+    flex: auto;
+    align-items: center;
+    align-content: center;
+    width: 80%;
+    height: 60em; /* Ensures the iframe always fits the viewport height */
+    border: none;
+    overflow: hidden; /* Prevents scrollbars inside the iframe */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Optional: adds a subtle shadow for styling */
+    border-radius: 8px; /* Optional: rounds the corners slightly */
+  }
   
   /* Responsividade */
   @media (max-width: 768px) {
