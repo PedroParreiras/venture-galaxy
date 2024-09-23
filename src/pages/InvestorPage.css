@@ -1,0 +1,25 @@
+/* src/pages/InvestorPage.css */
+.investor-page {
+    padding: 20px;
+  }
+  
+  .investor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .investor-header nav a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #007bff;
+  }
+  
+  .investor-header nav a:hover {
+    text-decoration: underline;
+  }
+  
+  .investor-main {
+    margin-top: 20px;
+  }
+  

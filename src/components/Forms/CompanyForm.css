@@ -1,0 +1,29 @@
+/* src/components/Forms/CompanyForm.css */
+.company-form {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .company-form h2 {
+    text-align: center;
+  }
+  
+  .company-form form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .company-form label {
+    margin-top: 10px;
+  }
+  
+  .company-form input {
+    padding: 8px;
+    margin-top: 5px;
+  }
+  
+  .company-form button {
+    margin-top: 20px;
+    padding: 10px;
+  }
+  

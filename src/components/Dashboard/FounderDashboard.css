@@ -1,0 +1,33 @@
+/* src/components/Dashboard/FounderDashboard.css */
+.founder-dashboard {
+    padding: 20px;
+  }
+  
+  .create-company-button {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+  
+  .company-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .company-list li {
+    margin-bottom: 10px;
+  }
+  
+  .company-list a {
+    text-decoration: none;
+    color: #007bff;
+  }
+  
+  .company-list a:hover {
+    text-decoration: underline;
+  }
+  

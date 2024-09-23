@@ -1,0 +1,23 @@
+/* src/pages/CompanyPage.css */
+.company-page {
+    padding: 20px;
+  }
+  
+  .company-header {
+    text-align: center;
+  }
+  
+  .company-main {
+    margin-top: 20px;
+  }
+  
+  .company-main p {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .company-footer {
+    margin-top: 30px;
+    text-align: center;
+  }
+  

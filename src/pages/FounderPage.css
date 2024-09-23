@@ -1,0 +1,25 @@
+/* src/pages/FounderPage.css */
+.founder-page {
+    padding: 20px;
+  }
+  
+  .founder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .founder-header nav a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #007bff;
+  }
+  
+  .founder-header nav a:hover {
+    text-decoration: underline;
+  }
+  
+  .founder-main {
+    margin-top: 20px;
+  }
+  

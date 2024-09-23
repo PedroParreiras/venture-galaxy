@@ -1,0 +1,181 @@
+/* src/components/Auth/Login.css */
+
+/* Variables for colors and common styles */
+:root {
+    --bg-color: #1e1e1e;
+    --form-bg-color: #2a2a2a;
+    --primary-color: #FF9348;
+    --secondary-color: #e58336;
+    --text-color: #f0f0f0;
+    --input-bg-color: #1e1e1e;
+    --input-border-color: #444;
+    --input-focus-border-color: var(--primary-color);
+    --placeholder-color: #777;
+    --error-bg-color: #ff4d4d;
+    --error-text-color: #fff;
+    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Container styles */
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--bg-color);
+    padding: 20px; /* Added padding for better spacing on mobile devices */
+  }
+  
+  /* Form styles */
+  .login-form {
+    background-color: var(--form-bg-color);
+    padding: 40px 30px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
+    color: var(--text-color);
+    box-shadow: var(--box-shadow);
+  }
+  
+  /* Heading styles */
+  .login-form h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: var(--primary-color);
+    font-size: 2rem; /* Increased font size for better visibility */
+  }
+  
+  /* Form group styles */
+  .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-color);
+  }
+  
+  /* Input styles */
+  .form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 5px;
+    background-color: var(--input-bg-color);
+    color: var(--text-color);
+    font-size: 1rem;
+  }
+  
+  .form-group input::placeholder {
+    color: var(--placeholder-color);
+  }
+  
+  .form-group input:focus {
+    border-color: var(--input-focus-border-color);
+    outline: none;
+    box-shadow: 0 0 5px rgba(255, 147, 72, 0.5); /* Added subtle glow */
+  }
+  
+  /* Button styles */
+  .btn {
+    width: 100%;
+    padding: 14px; /* Slightly increased padding */
+    background-color: var(--primary-color);
+    color: var(--bg-color);
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem; /* Increased font size */
+    font-weight: 600; /* Increased font weight */
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    margin-top: 15px; /* Increased margin for better spacing */
+  }
+  
+  .btn:hover {
+    background-color: var(--secondary-color);
+    box-shadow: var(--box-shadow); /* Added shadow on hover */
+  }
+  
+  /* Google button styles (if applicable) */
+  .btn-google {
+    background-color: #db4437;
+    color: #fff;
+  }
+  
+  .btn-google:hover {
+    background-color: #c33d2e;
+  }
+  
+  /* Separator styles */
+  .or-separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 30px 0;
+    color: #ccc;
+  }
+  
+  .or-separator::before,
+  .or-separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #444;
+  }
+  
+  .or-separator:not(:empty)::before {
+    margin-right: .75em;
+  }
+  
+  .or-separator:not(:empty)::after {
+    margin-left: .75em;
+  }
+  
+  /* Alert styles */
+  .alert {
+    background-color: var(--error-bg-color);
+    color: var(--error-text-color);
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  /* Footer styles */
+  .login-footer {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 0.9rem;
+  }
+  
+  .login-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  
+  .login-footer a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 480px) {
+    .login-form {
+      padding: 30px 20px;
+    }
+  
+    .login-form h2 {
+      font-size: 1.8rem;
+    }
+  
+    .btn {
+      padding: 12px;
+      font-size: 1rem;
+    }
+  
+    .form-group input {
+      padding: 10px;
+    }
+  }
+  
