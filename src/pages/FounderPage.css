@@ -1,25 +1,91 @@
-/* src/pages/FounderPage.css */
-.founder-page {
-    padding: 20px;
-  }
-  
-  .founder-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .founder-header nav a {
-    margin: 0 10px;
-    text-decoration: none;
-    color: #007bff;
-  }
-  
-  .founder-header nav a:hover {
-    text-decoration: underline;
-  }
-  
-  .founder-main {
-    margin-top: 20px;
-  }
-  
+/* src/pages/Dashboard.css */
+
+.dashboard {
+  font-family: 'Roboto', sans-serif;
+  color: #f0f0f0;
+  background-color: #1e1e1e;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-header {
+  padding: 40px 30px;
+  background-color: #2a2a2a;
+  text-align: center;
+}
+
+.dashboard-header h1 {
+  font-size: 2.5rem;
+  color: #FF9348;
+  margin-bottom: 10px;
+}
+
+.dashboard-header p {
+  font-size: 1.2rem;
+  color: #ccc;
+}
+
+.dashboard-options {
+  display: flex;
+  gap: 20px;
+  padding: 20px 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.option-card {
+  flex: 1;
+  max-width: 300px;
+  background-color: #2a2a2a;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.option-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
+}
+
+.option-icon {
+  font-size: 3rem;
+  color: #FF9348;
+  margin-bottom: 15px;
+}
+
+.option-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #f0f0f0;
+}
+
+.option-card p {
+  font-size: 1rem;
+  color: #ccc;
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 20px 30px;
+  background-color: #1e1e1e;
+  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.placeholder {
+  padding: 20px;
+  color: #ccc;
+}
+
+.dashboard-footer {
+  background-color: #1e1e1e;
+  color: #ccc;
+  padding: 20px 30px;
+  text-align: center;
+}
