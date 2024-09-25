@@ -31,12 +31,12 @@
 .form-group {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   position: relative;
 }
 
 .form-group label {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-weight: bold;
   color: #FF9348;
 }
@@ -113,15 +113,15 @@
 .company-data-display {
   padding: 30px;
   background-color: #1e1e1e;
-  border-radius: 10px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
   text-align: left;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .company-data-display h2 {
   color: #FF9348;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   font-size: 2rem;
   text-align: center;
 }
@@ -144,13 +144,13 @@
 .company-data-display .entity-logo {
   width: 150px;
   height: auto;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   border-radius: 8px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
 }
 
 .company-data-display button {
-  margin-top: 25px;
+  margin-top: 30px;
   width: 100%;
   padding: 14px 0;
   border: none;

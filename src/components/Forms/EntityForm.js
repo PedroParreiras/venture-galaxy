@@ -32,6 +32,18 @@ function EntityForm() {
     'Regtech', 'Retailtech', 'Socialtech', 'Software', 'Sporttech', 'Web3', 'Space'
   ];
 
+  // **Atualização: Opções de Estágios**
+  const stageOptions = [
+    'Aceleração',
+    'Anjo',
+    'Pre-Seed',
+    'Seed',
+    'Série A',
+    'Série B',
+    'Série C',
+    'Pre-IPO'
+  ];
+
   // Função para buscar os dados do investidor do Firestore
   useEffect(() => {
     const fetchEntityData = async () => {
@@ -62,6 +74,7 @@ function EntityForm() {
     fetchEntityData();
   }, [currentUser]);
 
+  // Função para fazer upload do logo
   const handleLogoUpload = async () => {
     if (!logo) return '';
     const logoRef = ref(storage, `logos/${currentUser.uid}/${logo.name}`);
@@ -130,6 +143,9 @@ function EntityForm() {
               <div className="form-group">
                 <label>Logo da Entidade:</label>
                 <input type="file" accept="image/*" onChange={handleFileChange} />
+                {logoURL && (
+                  <img src={logoURL} alt="Logo da Entidade" className="preview-image" />
+                )}
               </div>
 
               {/* Campo de Nome da Entidade */}
@@ -148,7 +164,7 @@ function EntityForm() {
                 <label>Setores de Interesse:</label>
                 <div className="checkbox-group">
                   {sectorOptions.map((option) => (
-                    <label key={option}>
+                    <label key={option} className="checkbox-label">
                       <input
                         type="checkbox"
                         value={option}
@@ -216,10 +232,11 @@ function EntityForm() {
                   required
                 >
                   <option value="">Selecione</option>
-                  <option value="Seed">Seed</option>
-                  <option value="Series A">Series A</option>
-                  <option value="Series B">Series B</option>
-                  <option value="Growth">Growth</option>
+                  {stageOptions.map((stage) => (
+                    <option key={stage} value={stage}>
+                      {stage}
+                    </option>
+                  ))}
                 </select>
               </div>
 

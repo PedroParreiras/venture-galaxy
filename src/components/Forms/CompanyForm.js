@@ -24,6 +24,7 @@ function CompanyForm() {
   const [founderShare, setFounderShare] = useState('');
   const [annualRevenue, setAnnualRevenue] = useState('');
   const [valuation, setValuation] = useState('');
+  const [stage, setStage] = useState(''); // Novo estado para o estágio
 
   // Opções de Setores de Interesse (Pode ser separado ou mantido como select)
   const sectorOptions = [
@@ -32,6 +33,18 @@ function CompanyForm() {
     'Femtech', 'Fintech', 'Foodtech', 'Games', 'Govtech', 'Healthtech', 'HRtech', 'Indtech',
     'Insurtech', 'Legaltech', 'Logtech', 'MarketPlaces', 'Martech', 'Nanotech', 'Proptech',
     'Regtech', 'Retailtech', 'Socialtech', 'Software', 'Sporttech', 'Web3', 'Space',
+  ];
+
+  // Opções de Estágios
+  const stageOptions = [
+    'Aceleração',
+    'Anjo',
+    'Pre-Seed',
+    'Seed',
+    'Série A',
+    'Série B',
+    'Série C',
+    'Pre-IPO',
   ];
 
   // Função para buscar os dados da empresa do Firestore
@@ -54,6 +67,7 @@ function CompanyForm() {
             setValuation(data.valuation || '');
             setLogoURL(data.logoURL || '');
             setPitchURL(data.pitchURL || '');
+            setStage(data.stage || ''); // Define o estágio existente
             setIsFormVisible(false);
           }
         } catch (error) {
@@ -120,6 +134,7 @@ function CompanyForm() {
       founderShare: parseFloat(founderShare),
       annualRevenue: parseFloat(annualRevenue),
       valuation: parseFloat(valuation),
+      stage, // Adiciona o estágio
       logoURL: uploadedLogoURL || '',
       pitchURL: uploadedPitchURL || '',
       founders: [currentUser.uid],
@@ -202,6 +217,7 @@ function CompanyForm() {
                   value={employees}
                   onChange={(e) => setEmployees(e.target.value)}
                   required
+                  min="1"
                 />
               </div>
 
@@ -258,6 +274,23 @@ function CompanyForm() {
                 </select>
               </div>
 
+              {/* Estágio da Empresa */}
+              <div className="form-group">
+                <label>Estágio da Empresa:</label>
+                <select
+                  value={stage}
+                  onChange={(e) => setStage(e.target.value)}
+                  required
+                >
+                  <option value="">Selecione</option>
+                  {stageOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {/* Valuation Atual */}
               <div className="form-group">
                 <label>Valuation Atual:</label>
@@ -292,6 +325,8 @@ function CompanyForm() {
             <p><strong>Data de Criação:</strong> {companyData.creationDate}</p>
             <p><strong>Porcentagem na Mão de Fundadores:</strong> {companyData.founderShare}%</p>
             <p><strong>Receita Anual:</strong> R$ {companyData.annualRevenue}</p>
+            <p><strong>Setor de Atuação:</strong> {companyData.sector}</p>
+            <p><strong>Estágio da Empresa:</strong> {companyData.stage}</p>
             <p><strong>Valuation Atual:</strong> R$ {companyData.valuation}</p>
             <button onClick={handleEditAgain} className="btn-primary">Editar</button>
           </div>
