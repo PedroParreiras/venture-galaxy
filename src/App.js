@@ -10,15 +10,27 @@ import InvestorPage from './pages/InvestorPage';
 import CompanyPage from './pages/CompanyPage';
 import EntityForm from './components/Forms/EntityForm';
 import PrivateRoute from './components/PrivateRoute';
+import Dashboard from './pages/Dashboard'; // Importe o Dashboard
+import Header from './components/Header'; // Importa o Header
+
 
 function App() {
   return (
     <Router>
       <AuthProvider>
+      <Header /> {/* Header será exibido em todas as páginas */}
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
           <Route
             path="/founder-dashboard"
             element={
@@ -51,7 +63,6 @@ function App() {
               </PrivateRoute>
             }
           />
-          {/* Outras rotas */}
         </Routes>
       </AuthProvider>
     </Router>
