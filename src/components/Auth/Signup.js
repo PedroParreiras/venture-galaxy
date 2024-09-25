@@ -2,6 +2,8 @@
 import React, { useRef, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import { db } from '../../firebase';
+import { doc, setDoc } from 'firebase/firestore';
 import './Signup.css';
 
 function Signup() {
@@ -10,6 +12,7 @@ function Signup() {
   const userTypeRef = useRef();
   const { signup } = useAuth();
   const [error, setError] = useState('');
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
@@ -17,12 +20,20 @@ function Signup() {
 
     try {
       setError('');
-      await signup(
+      const userCredential = await signup(
         emailRef.current.value,
         passwordRef.current.value,
         userTypeRef.current.value
       );
-      navigate('/');
+
+      if (userCredential && userCredential.user) {
+        await setDoc(doc(db, 'users', userCredential.user.uid), {
+          email: emailRef.current.value,
+          userType: userTypeRef.current.value,
+        });
+        setShowSuccessPopup(true);
+        navigate('/dashboard'); // Redireciona para o Dashboard após o sucesso
+      }
     } catch (error) {
       setError('Falha ao criar a conta');
       console.error('Erro no cadastro:', error);
@@ -51,6 +62,7 @@ function Signup() {
               <option value="">Selecione</option>
               <option value="founder">Founder</option>
               <option value="investor">Investor</option>
+              <option value="other">Other</option>
             </select>
           </div>
 
@@ -62,6 +74,17 @@ function Signup() {
           Já tem uma conta? <Link to="/login">Entre aqui</Link>
         </p>
       </div>
+
+      {showSuccessPopup && (
+        <div className="popup-overlay">
+          <div className="popup">
+            <h3>Conta criada com sucesso!</h3>
+            <button onClick={() => navigate('/dashboard')} className="btn btn-primary">
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
