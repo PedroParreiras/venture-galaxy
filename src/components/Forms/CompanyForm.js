@@ -1,53 +1,35 @@
 // src/components/Forms/CompanyForm.js
 import React, { useState, useEffect } from 'react';
-import { db, storage } from '../../firebase'; // Certifique-se de que o Firebase está configurado corretamente
+import { db } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import './CompanyForm.css';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import CompanyCard from '../CompanyCard/CompanyCard';
 
 function CompanyForm() {
   const { currentUser } = useAuth();
   const [companyData, setCompanyData] = useState(null);
   const [isFormVisible, setIsFormVisible] = useState(true);
 
-  // Inicializa os estados com valores vazios ou os dados existentes
+  // Estados para os campos do formulário
   const [companyName, setCompanyName] = useState('');
   const [sector, setSector] = useState('');
   const [fundingNeeded, setFundingNeeded] = useState('');
-  const [logo, setLogo] = useState(null);
-  const [logoURL, setLogoURL] = useState('');
-  const [pitch, setPitch] = useState(null);
-  const [pitchURL, setPitchURL] = useState('');
   const [employees, setEmployees] = useState('');
   const [creationDate, setCreationDate] = useState('');
   const [founderShare, setFounderShare] = useState('');
   const [annualRevenue, setAnnualRevenue] = useState('');
   const [valuation, setValuation] = useState('');
-  const [stage, setStage] = useState(''); // Novo estado para o estágio
+  const [stage, setStage] = useState('');
+  const [logo, setLogo] = useState(null);
+  const [logoURL, setLogoURL] = useState('');
+  const [pitch, setPitch] = useState(null);
+  const [pitchURL, setPitchURL] = useState('');
 
-  // Opções de Setores de Interesse (Pode ser separado ou mantido como select)
-  const sectorOptions = [
-    'Agnostic', 'Adtech', 'Agtech', 'Biotech', 'Cannabis', 'Cibersecurity', 'Cleantech',
-    'Construtech', 'Datatech', 'Deeptech', 'Ecommerce', 'Edtech', 'Energytech', 'ESG',
-    'Femtech', 'Fintech', 'Foodtech', 'Games', 'Govtech', 'Healthtech', 'HRtech', 'Indtech',
-    'Insurtech', 'Legaltech', 'Logtech', 'MarketPlaces', 'Martech', 'Nanotech', 'Proptech',
-    'Regtech', 'Retailtech', 'Socialtech', 'Software', 'Sporttech', 'Web3', 'Space',
-  ];
+  // Opções de setores e estágios
+  const sectorOptions = [/* suas opções */];
+  const stageOptions = [/* suas opções */];
 
-  // Opções de Estágios
-  const stageOptions = [
-    'Aceleração',
-    'Anjo',
-    'Pre-Seed',
-    'Seed',
-    'Série A',
-    'Série B',
-    'Série C',
-    'Pre-IPO',
-  ];
-
-  // Função para buscar os dados da empresa do Firestore
   useEffect(() => {
     const fetchCompanyData = async () => {
       if (currentUser) {
@@ -65,9 +47,9 @@ function CompanyForm() {
             setFounderShare(data.founderShare || '');
             setAnnualRevenue(data.annualRevenue || '');
             setValuation(data.valuation || '');
+            setStage(data.stage || '');
             setLogoURL(data.logoURL || '');
             setPitchURL(data.pitchURL || '');
-            setStage(data.stage || ''); // Define o estágio existente
             setIsFormVisible(false);
           }
         } catch (error) {
@@ -79,20 +61,82 @@ function CompanyForm() {
     fetchCompanyData();
   }, [currentUser]);
 
-  // Função para fazer upload do logo
+  // Função para fazer upload do logo via Cloud Function
   const handleLogoUpload = async () => {
     if (!logo) return '';
-    const logoRef = ref(storage, `logos/${currentUser.uid}/${logo.name}`);
-    await uploadBytes(logoRef, logo);
-    return await getDownloadURL(logoRef);
+    try {
+      const reader = new FileReader();
+      const fileData = await new Promise((resolve, reject) => {
+        reader.onloadend = () => {
+          const base64data = reader.result.split(',')[1];
+          resolve(base64data);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(logo);
+      });
+
+      const response = await fetch('https://us-central1-your-project.cloudfunctions.net/api/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fileName: logo.name,
+          fileData,
+          fileType: logo.type,
+          userId: currentUser.uid,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro no upload do logo');
+      }
+
+      const data = await response.json();
+      return data.url;
+    } catch (error) {
+      console.error('Erro ao fazer upload do logo:', error);
+      throw error;
+    }
   };
 
-  // Função para fazer upload do pitch
+  // Função para fazer upload do pitch via Cloud Function
   const handlePitchUpload = async () => {
     if (!pitch) return '';
-    const pitchRef = ref(storage, `pitches/${currentUser.uid}/${pitch.name}`);
-    await uploadBytes(pitchRef, pitch);
-    return await getDownloadURL(pitchRef);
+    try {
+      const reader = new FileReader();
+      const fileData = await new Promise((resolve, reject) => {
+        reader.onloadend = () => {
+          const base64data = reader.result.split(',')[1];
+          resolve(base64data);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(pitch);
+      });
+
+      const response = await fetch('https://us-central1-your-project.cloudfunctions.net/api/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fileName: pitch.name,
+          fileData,
+          fileType: pitch.type,
+          userId: currentUser.uid,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro no upload do pitch');
+      }
+
+      const data = await response.json();
+      return data.url;
+    } catch (error) {
+      console.error('Erro ao fazer upload do pitch:', error);
+      throw error;
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -107,7 +151,6 @@ function CompanyForm() {
         uploadedLogoURL = await handleLogoUpload();
         setLogoURL(uploadedLogoURL);
       } catch (error) {
-        console.error('Erro ao fazer upload do logo:', error);
         alert('Ocorreu um erro ao fazer upload do logo. Tente novamente.');
         return;
       }
@@ -119,7 +162,6 @@ function CompanyForm() {
         uploadedPitchURL = await handlePitchUpload();
         setPitchURL(uploadedPitchURL);
       } catch (error) {
-        console.error('Erro ao fazer upload do pitch:', error);
         alert('Ocorreu um erro ao fazer upload do pitch. Tente novamente.');
         return;
       }
@@ -134,7 +176,7 @@ function CompanyForm() {
       founderShare: parseFloat(founderShare),
       annualRevenue: parseFloat(annualRevenue),
       valuation: parseFloat(valuation),
-      stage, // Adiciona o estágio
+      stage,
       logoURL: uploadedLogoURL || '',
       pitchURL: uploadedPitchURL || '',
       founders: [currentUser.uid],
@@ -143,8 +185,8 @@ function CompanyForm() {
 
     try {
       await setDoc(doc(db, 'companies', currentUser.uid), data, { merge: true });
-      setCompanyData(data); // Atualiza o estado com os dados salvos
-      setIsFormVisible(false); // Oculta o formulário após o envio
+      setCompanyData(data);
+      setIsFormVisible(false);
       alert('Empresa salva com sucesso!');
     } catch (error) {
       console.error('Erro ao salvar a empresa:', error);
@@ -160,7 +202,7 @@ function CompanyForm() {
   };
 
   const handleEditAgain = () => {
-    setIsFormVisible(true); // Mostra o formulário para edição
+    setIsFormVisible(true);
   };
 
   return (
@@ -209,6 +251,7 @@ function CompanyForm() {
                 )}
               </div>
 
+              {/* Outros campos */}
               {/* Número de Funcionários */}
               <div className="form-group">
                 <label>Número de Funcionários:</label>
@@ -309,25 +352,7 @@ function CompanyForm() {
           </>
         ) : (
           <div className="company-data-display">
-            <h2>Dados da Empresa</h2>
-            {logoURL && <img src={logoURL} alt="Logo da Empresa" className="entity-logo" />}
-            {pitchURL && (
-              <p>
-                <strong>Pitch:</strong>{' '}
-                <a href={pitchURL} target="_blank" rel="noopener noreferrer">
-                  Visualizar Pitch
-                </a>
-              </p>
-            )}
-            <p><strong>Nome da Startup:</strong> {companyData.name}</p>
-            <p><strong>Setor:</strong> {companyData.sector}</p>
-            <p><strong>Número de Funcionários:</strong> {companyData.employees}</p>
-            <p><strong>Data de Criação:</strong> {companyData.creationDate}</p>
-            <p><strong>Porcentagem na Mão de Fundadores:</strong> {companyData.founderShare}%</p>
-            <p><strong>Receita Anual:</strong> R$ {companyData.annualRevenue}</p>
-            <p><strong>Setor de Atuação:</strong> {companyData.sector}</p>
-            <p><strong>Estágio da Empresa:</strong> {companyData.stage}</p>
-            <p><strong>Valuation Atual:</strong> R$ {companyData.valuation}</p>
+            <CompanyCard company={companyData} onEdit={handleEditAgain} />
             <button onClick={handleEditAgain} className="btn-primary">Editar</button>
           </div>
         )}

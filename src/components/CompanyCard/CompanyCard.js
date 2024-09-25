@@ -2,7 +2,7 @@
 import React from 'react';
 import './CompanyCard.css';
 
-function CompanyCard({ company }) {
+function CompanyCard({ company, onEdit }) {
   return (
     <div className="company-card">
       {/* Logo da Empresa */}
@@ -33,6 +33,7 @@ function CompanyCard({ company }) {
             </a>
           </p>
         )}
+        <button className="edit-button" onClick={onEdit}>Editar</button>
       </div>
     </div>
   );

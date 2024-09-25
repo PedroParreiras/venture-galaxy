@@ -1,26 +1,25 @@
 // src/pages/Dashboard.js
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { doc, getDoc } from 'firebase/firestore'; // Para buscar o tipo de usuário e dados do Firestore
-import { db } from '../firebase'; // Certifique-se de que o Firestore está corretamente configurado
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import './Dashboard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faTachometerAlt, faFunnelDollar } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faFunnelDollar } from '@fortawesome/free-solid-svg-icons';
 import CompanyForm from '../components/Forms/CompanyForm';
 import EntityForm from '../components/Forms/EntityForm';
 import FounderFunnel from '../components/Funnel/FounderFunnel';
 import InvestorFunnel from '../components/Funnel/InvestorFunnel';
-import CompanyCard from '../components/CompanyCard/CompanyCard'; // Importando o CompanyCard
-import EntityCard from '../components/EntityCard/EntityCard'; // Importando o EntityCard
+import CompanyCard from '../components/CompanyCard/CompanyCard';
+import EntityCard from '../components/EntityCard/EntityCard';
 
 function Dashboard() {
   const { currentUser } = useAuth();
-  const [view, setView] = useState(null); // Controla qual conteúdo deve ser renderizado
+  const [view, setView] = useState(null);
   const [userType, setUserType] = useState(null);
-  const [hasData, setHasData] = useState(false); // Indica se o usuário já preencheu os dados
-  const [userData, setUserData] = useState(null); // Dados do usuário (empresa ou investidor)
+  const [hasData, setHasData] = useState(false);
+  const [userData, setUserData] = useState(null);
 
-  // Pega o tipo de usuário e verifica se os dados já foram preenchidos
   useEffect(() => {
     const fetchUserData = async () => {
       if (currentUser) {
@@ -29,9 +28,8 @@ function Dashboard() {
           const userDocSnap = await getDoc(userDocRef);
           if (userDocSnap.exists()) {
             const userDataFromDB = userDocSnap.data();
-            setUserType(userDataFromDB.userType); // Define o tipo de usuário (founder ou investor)
+            setUserType(userDataFromDB.userType);
 
-            // Dependendo do tipo de usuário, busca os dados na coleção correspondente
             if (userDataFromDB.userType === 'founder') {
               const companyDocRef = doc(db, 'companies', currentUser.uid);
               const companyDocSnap = await getDoc(companyDocRef);
@@ -61,19 +59,19 @@ function Dashboard() {
     fetchUserData();
   }, [currentUser]);
 
-  // Função para renderizar o conteúdo com base na visualização atual
   const renderContent = () => {
     if (hasData && userType) {
-      // Se o usuário já preencheu os dados, exibe o card correspondente
-      return userType === 'founder' ? <CompanyCard company={userData} /> : <EntityCard entity={userData} />;
+      return userType === 'founder' ? (
+        <CompanyCard company={userData} onEdit={() => setView('user-data')} />
+      ) : (
+        <EntityCard entity={userData} onEdit={() => setView('user-data')} />
+      );
     }
 
-    // Se o usuário ainda não preencheu os dados, exibe o formulário correspondente
     if (!hasData && userType) {
       return userType === 'founder' ? <CompanyForm /> : <EntityForm />;
     }
 
-    // Se o tipo de usuário ainda não foi carregado ou há um erro, exibe uma mensagem de carregamento
     return (
       <div className="placeholder">
         <p>Carregando...</p>
@@ -89,7 +87,7 @@ function Dashboard() {
       </header>
 
       {/* Opções do Dashboard */}
-      {!hasData && (
+      {!hasData && userType && (
         <div className="dashboard-options">
           <div className="option-card" onClick={() => setView('user-data')}>
             <FontAwesomeIcon icon={faUser} className="option-icon" />
@@ -101,18 +99,18 @@ function Dashboard() {
             <h3>Funil do Usuário</h3>
             <p>Acompanhe o progresso do seu funil de atividades.</p>
           </div>
-          {/* Você pode adicionar mais opções aqui */}
+          {/* Adicione mais opções conforme necessário */}
         </div>
       )}
 
       {/* Conteúdo Principal */}
       <main className="dashboard-content">
-        {hasData ? (
-          renderContent()
-        ) : view === 'user-data' ? (
+        {view === 'user-data' ? (
           renderContent()
         ) : view === 'user-funnel' && userType ? (
           userType === 'founder' ? <FounderFunnel /> : <InvestorFunnel />
+        ) : hasData ? (
+          renderContent()
         ) : (
           <div className="placeholder">
             <p>Selecione uma opção acima para ver mais detalhes.</p>

@@ -1,106 +1,111 @@
 /* src/pages/Dashboard.css */
 
-/* Reset básico */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  .dashboard {
-    font-family: 'Roboto', sans-serif;
-    color: #f0f0f0;
-    background-color: #1e1e1e;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .dashboard-header {
-    padding: 40px 30px;
-    background-color: #2a2a2a;
-    text-align: center;
-  }
-  
-  .dashboard-header h1 {
-    font-size: 2.5rem;
-    color: #FF9348;
-    margin-bottom: 10px;
-  }
-  
-  .dashboard-header p {
-    font-size: 1.2rem;
-    color: #ccc;
-  }
-  
-  .dashboard-main {
-    flex: 1;
-    padding: 30px;
-    background-color: #1e1e1e;
-  }
-  
-  .dashboard-stats {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-bottom: 40px;
-  }
-  
-  .stat-card {
-    flex: 1;
-    max-width: 250px;
-    background-color: #2a2a2a;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    transition: transform 0.3s;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-  }
-  
-  .stat-card:hover {
-    transform: translateY(-10px);
-  }
-  
-  .stat-icon {
-    font-size: 3rem;
-    color: #FF9348;
-    margin-bottom: 15px;
-  }
-  
-  .stat-card h3 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-    color: #f0f0f0;
-  }
-  
-  .stat-card p {
-    font-size: 1rem;
-    color: #ccc;
-  }
-  
-  .dashboard-content {
-    padding: 20px;
-    background-color: #2a2a2a;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-  }
-  
-  .dashboard-content h2 {
-    font-size: 2rem;
-    color: #FF9348;
-    margin-bottom: 10px;
-  }
-  
-  .dashboard-content p {
-    font-size: 1rem;
-    color: #ccc;
-  }
-  
-  .dashboard-footer {
-    background-color: #1e1e1e;
-    color: #ccc;
-    padding: 20px 30px;
-    text-align: center;
-  }
-  
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #121212;
+  color: #f0f0f0;
+}
+
+.dashboard-header {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #1e1e1e;
+  border-bottom: 2px solid #FF9348;
+}
+
+.dashboard-header h1 {
+  font-size: 2.5rem;
+  color: #FF9348;
+  margin-bottom: 10px;
+}
+
+.dashboard-header p {
+  font-size: 1.2rem;
+  color: #ccc;
+}
+
+.dashboard-options {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 30px 20px;
+}
+
+.option-card {
+  background-color: #2a2a2a;
+  border-radius: 12px;
+  width: 250px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.option-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.option-icon {
+  font-size: 2rem;
+  color: #FF9348;
+  margin-bottom: 15px;
+}
+
+.option-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: #FF9348;
+}
+
+.option-card p {
+  font-size: 1rem;
+  color: #ccc;
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.placeholder {
+  text-align: center;
+  color: #ccc;
+  font-size: 1.2rem;
+}
+
+.dashboard-footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #1e1e1e;
+  border-top: 2px solid #FF9348;
+}
+
+.dashboard-footer p {
+  margin: 0;
+  font-size: 1rem;
+  color: #ccc;
+}
+
+/* Estilos para o botão de edição nos cards */
+.edit-button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #FF9348;
+  color: #1e1e1e;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.edit-button:hover {
+  background-color: #e58336;
+}

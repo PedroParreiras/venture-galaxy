@@ -2,7 +2,7 @@
 import React from 'react';
 import './EntityCard.css';
 
-function EntityCard({ entity }) {
+function EntityCard({ entity, onEdit }) {
   return (
     <div className="entity-card">
       {/* Logo da Entidade */}
@@ -24,6 +24,7 @@ function EntityCard({ entity }) {
         <p className="entity-preferred-stage"><strong>Estágio Preferido:</strong> {entity.preferredStage}</p>
         <p className="entity-preferred-revenue"><strong>Receita Anual Preferida:</strong> R$ {entity.preferredRevenue.toLocaleString()}</p>
         <p className="entity-preferred-valuation"><strong>Valuation Preferido:</strong> R$ {entity.preferredValuation.toLocaleString()}</p>
+        <button className="edit-button" onClick={onEdit}>Editar</button>
       </div>
     </div>
   );

@@ -1,17 +1,18 @@
 // src/components/Forms/EntityForm.js
 import React, { useState, useEffect } from 'react';
-import { db, storage } from '../../firebase'; // Certifique-se de que o Firebase está configurado corretamente
+import { auth, db, storage } from '../../firebase'; // Importando auth, db e storage
 import { useAuth } from '../../contexts/AuthContext';
 import './EntityForm.css';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import EntityCard from '../EntityCard/EntityCard'; // Importando o EntityCard
 
 function EntityForm() {
   const { currentUser } = useAuth();
   const [entityData, setEntityData] = useState(null);
   const [isFormVisible, setIsFormVisible] = useState(true);
 
-  // Inicializa os estados com valores vazios ou os dados existentes
+  // Estados para os campos do formulário
   const [entityName, setEntityName] = useState('');
   const [sectorInterest, setSectorInterest] = useState([]);
   const [aum, setAum] = useState('');
@@ -32,7 +33,7 @@ function EntityForm() {
     'Regtech', 'Retailtech', 'Socialtech', 'Software', 'Sporttech', 'Web3', 'Space'
   ];
 
-  // **Atualização: Opções de Estágios**
+  // Opções de Estágios
   const stageOptions = [
     'Aceleração',
     'Anjo',
@@ -272,16 +273,7 @@ function EntityForm() {
           </>
         ) : (
           <div className="entity-data-display">
-            <h2>Informações do Investidor</h2>
-            {logoURL && <img src={logoURL} alt="Logo da Entidade" className="entity-logo" />}
-            <p><strong>Nome da Entidade:</strong> {entityData.name}</p>
-            <p><strong>Setores de Interesse:</strong> {entityData.sectorInterest.join(', ')}</p>
-            <p><strong>Assets Under Management:</strong> R$ {entityData.aum}</p>
-            <p><strong>Most Common Ticket Size:</strong> R$ {entityData.ticketSize}</p>
-            <p><strong>Dry Powder:</strong> R$ {entityData.dryPowder}</p>
-            <p><strong>Estágio Preferido da Empresa:</strong> {entityData.preferredStage}</p>
-            <p><strong>Receita Anual Preferida:</strong> R$ {entityData.preferredRevenue}</p>
-            <p><strong>Valuation Preferido:</strong> R$ {entityData.preferredValuation}</p>
+            <EntityCard entity={entityData} onEdit={handleEditAgain} />
             <button onClick={handleEditAgain} className="btn-primary">Responder Novamente</button>
           </div>
         )}
