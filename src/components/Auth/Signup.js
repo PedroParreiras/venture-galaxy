@@ -20,6 +20,7 @@ function Signup() {
 
     try {
       setError('');
+      // Create a new user with email, password, and user type
       const userCredential = await signup(
         emailRef.current.value,
         passwordRef.current.value,
@@ -27,12 +28,19 @@ function Signup() {
       );
 
       if (userCredential && userCredential.user) {
+        // Save the user data to Firestore
         await setDoc(doc(db, 'users', userCredential.user.uid), {
           email: emailRef.current.value,
           userType: userTypeRef.current.value,
         });
+
+        // Show success popup
         setShowSuccessPopup(true);
-        navigate('/dashboard'); // Redireciona para o Dashboard após o sucesso
+
+        // Redirect to the dashboard after a short delay
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 2000); // Adjust delay time if needed
       }
     } catch (error) {
       setError('Falha ao criar a conta');

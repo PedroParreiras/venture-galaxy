@@ -95,15 +95,18 @@ function EntityCard({ entity }) {
       ) : (
         <>
           <span>{isCurrency ? `R$ ${value.toLocaleString()}` : value}</span>
-          <button
-            className="edit-button"
-            onClick={() => {
-              setEditingField(field);
-              setFieldValue(value);
-            }}
-          >
-            Edit
-          </button>
+          {/* Show the edit button only if the current user's email matches the founder's email */}
+          {currentUser?.email === entity.email && (
+            <button
+              className="edit-button"
+              onClick={() => {
+                setEditingField(field);
+                setFieldValue(value);
+              }}
+            >
+              Edit
+            </button>
+          )}
         </>
       )}
     </div>
