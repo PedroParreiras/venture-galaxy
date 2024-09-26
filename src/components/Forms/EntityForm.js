@@ -1,10 +1,10 @@
 // src/components/Forms/EntityForm.js
+
 import React, { useState, useEffect } from 'react';
 import { auth, db, storage } from '../../firebase'; // Importando auth, db e storage
 import { useAuth } from '../../contexts/AuthContext';
 import './EntityForm.css';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import EntityCard from '../EntityCard/EntityCard'; // Importando o EntityCard
 
 function EntityForm() {
@@ -75,12 +75,33 @@ function EntityForm() {
     fetchEntityData();
   }, [currentUser]);
 
-  // Função para fazer upload do logo
+  // Função para fazer upload do logo via Serverless Function com Autenticação
   const handleLogoUpload = async () => {
     if (!logo) return '';
-    const logoRef = ref(storage, `logos/${currentUser.uid}/${logo.name}`);
-    await uploadBytes(logoRef, logo);
-    return await getDownloadURL(logoRef);
+    const formData = new FormData();
+    formData.append('logo', logo);
+    formData.append('userId', currentUser.uid); // Passando o userId como campo
+
+    try {
+      const token = await auth.currentUser.getIdToken(); // Obtém o token de autenticação
+      const response = await fetch('/api/uploadLogo', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro no upload do logo');
+      }
+
+      const data = await response.json();
+      return data.url;
+    } catch (error) {
+      console.error('Erro ao fazer upload do logo:', error);
+      throw error;
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -93,7 +114,6 @@ function EntityForm() {
         uploadedLogoURL = await handleLogoUpload();
         setLogoURL(uploadedLogoURL);
       } catch (error) {
-        console.error('Erro ao fazer upload do logo:', error);
         alert('Ocorreu um erro ao fazer upload do logo. Tente novamente.');
         return;
       }
