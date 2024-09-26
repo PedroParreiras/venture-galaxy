@@ -60,23 +60,25 @@ function Dashboard() {
   }, [currentUser]);
 
   const renderContent = () => {
-    if (hasData && userType) {
-      return userType === 'founder' ? (
-        <CompanyCard company={userData} onEdit={() => setView('user-data')} />
-      ) : (
-        <EntityCard entity={userData} onEdit={() => setView('user-data')} />
+    if (view === 'user-data') {
+      if (hasData && userType) {
+        return userType === 'founder' ? (
+          <CompanyCard company={userData} onEdit={() => setView('user-data')} />
+        ) : (
+          <EntityCard entity={userData} onEdit={() => setView('user-data')} />
+        );
+      } else if (!hasData && userType) {
+        return userType === 'founder' ? <CompanyForm /> : <EntityForm />;
+      }
+    } else if (view === 'user-funnel') {
+      return userType === 'founder' ? <FounderFunnel /> : <InvestorFunnel />;
+    } else {
+      return (
+        <div className="placeholder">
+          <p>Selecione uma opção acima para ver mais detalhes.</p>
+        </div>
       );
     }
-
-    if (!hasData && userType) {
-      return userType === 'founder' ? <CompanyForm /> : <EntityForm />;
-    }
-
-    return (
-      <div className="placeholder">
-        <p>Carregando...</p>
-      </div>
-    );
   };
 
   return (
@@ -87,7 +89,7 @@ function Dashboard() {
       </header>
 
       {/* Opções do Dashboard */}
-      {!hasData && userType && (
+      {userType && (
         <div className="dashboard-options">
           <div className="option-card" onClick={() => setView('user-data')}>
             <FontAwesomeIcon icon={faUser} className="option-icon" />
@@ -105,17 +107,7 @@ function Dashboard() {
 
       {/* Conteúdo Principal */}
       <main className="dashboard-content">
-        {view === 'user-data' ? (
-          renderContent()
-        ) : view === 'user-funnel' && userType ? (
-          userType === 'founder' ? <FounderFunnel /> : <InvestorFunnel />
-        ) : hasData ? (
-          renderContent()
-        ) : (
-          <div className="placeholder">
-            <p>Selecione uma opção acima para ver mais detalhes.</p>
-          </div>
-        )}
+        {renderContent()}
       </main>
 
       <footer className="dashboard-footer">

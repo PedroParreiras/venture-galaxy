@@ -1,10 +1,12 @@
 // src/components/Forms/CompanyForm.js
+
 import React, { useState, useEffect } from 'react';
-import { db } from '../../firebase';
+import { db, storage } from '../../firebase'; // Importando db e storage
 import { useAuth } from '../../contexts/AuthContext';
 import './CompanyForm.css';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import CompanyCard from '../CompanyCard/CompanyCard';
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"; // Importando funções do Storage
+import CompanyCard from '../CompanyCard/CompanyCard'; // Importando o CompanyCard
 
 function CompanyForm() {
   const { currentUser } = useAuth();
@@ -25,11 +27,30 @@ function CompanyForm() {
   const [logoURL, setLogoURL] = useState('');
   const [pitch, setPitch] = useState(null);
   const [pitchURL, setPitchURL] = useState('');
+  const [uploadProgressLogo, setUploadProgressLogo] = useState(0); // Estado para progresso do logo
+  const [uploadProgressPitch, setUploadProgressPitch] = useState(0); // Estado para progresso do pitch
+  const [error, setError] = useState('');
 
   // Opções de setores e estágios
-  const sectorOptions = [/* suas opções */];
-  const stageOptions = [/* suas opções */];
+  const sectorOptions = [
+    'Agnostic', 'Adtech', 'Agtech', 'Biotech', 'Cannabis', 'Cibersecurity', 'Cleantech',
+    'Construtech', 'Datatech', 'Deeptech', 'Ecommerce', 'Edtech', 'Energytech', 'ESG',
+    'Femtech', 'Fintech', 'Foodtech', 'Games', 'Govtech', 'Healthtech', 'HRtech', 'Indtech',
+    'Insurtech', 'Legaltech', 'Logtech', 'MarketPlaces', 'Martech', 'Nanotech', 'Proptech',
+    'Regtech', 'Retailtech', 'Socialtech', 'Software', 'Sporttech', 'Web3', 'Space'
+  ];
+  const stageOptions = [
+    'Aceleração',
+    'Anjo',
+    'Pre-Seed',
+    'Seed',
+    'Série A',
+    'Série B',
+    'Série C',
+    'Pre-IPO'
+  ];
 
+  // Função para buscar os dados da empresa do Firestore
   useEffect(() => {
     const fetchCompanyData = async () => {
       if (currentUser) {
@@ -41,12 +62,12 @@ function CompanyForm() {
             setCompanyData(data);
             setCompanyName(data.name || '');
             setSector(data.sector || '');
-            setFundingNeeded(data.fundingNeeded || '');
-            setEmployees(data.employees || '');
+            setFundingNeeded(data.fundingNeeded ? data.fundingNeeded.toString() : '');
+            setEmployees(data.employees ? data.employees.toString() : '');
             setCreationDate(data.creationDate || '');
-            setFounderShare(data.founderShare || '');
-            setAnnualRevenue(data.annualRevenue || '');
-            setValuation(data.valuation || '');
+            setFounderShare(data.founderShare ? data.founderShare.toString() : '');
+            setAnnualRevenue(data.annualRevenue ? data.annualRevenue.toString() : '');
+            setValuation(data.valuation ? data.valuation.toString() : '');
             setStage(data.stage || '');
             setLogoURL(data.logoURL || '');
             setPitchURL(data.pitchURL || '');
@@ -54,6 +75,7 @@ function CompanyForm() {
           }
         } catch (error) {
           console.error('Erro ao buscar dados da empresa:', error);
+          setError('Erro ao buscar seus dados. Tente novamente mais tarde.');
         }
       }
     };
@@ -61,86 +83,69 @@ function CompanyForm() {
     fetchCompanyData();
   }, [currentUser]);
 
-  // Função para fazer upload do logo via Cloud Function
-  const handleLogoUpload = async () => {
-    if (!logo) return '';
-    try {
-      const reader = new FileReader();
-      const fileData = await new Promise((resolve, reject) => {
-        reader.onloadend = () => {
-          const base64data = reader.result.split(',')[1];
-          resolve(base64data);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(logo);
-      });
-
-      const response = await fetch('https://us-central1-your-project.cloudfunctions.net/api/upload', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fileName: logo.name,
-          fileData,
-          fileType: logo.type,
-          userId: currentUser.uid,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro no upload do logo');
+  // Função para fazer upload do logo diretamente no Firebase Storage
+  const handleLogoUpload = () => {
+    return new Promise((resolve, reject) => {
+      if (!logo) {
+        resolve(''); // Se não houver logo para upload, retorna uma string vazia
+        return;
       }
 
-      const data = await response.json();
-      return data.url;
-    } catch (error) {
-      console.error('Erro ao fazer upload do logo:', error);
-      throw error;
-    }
+      const fileName = `${Date.now()}_${logo.name}`;
+      const storageRefLogo = ref(storage, `logos/${currentUser.uid}/${fileName}`);
+      const uploadTaskLogo = uploadBytesResumable(storageRefLogo, logo);
+
+      uploadTaskLogo.on('state_changed',
+        (snapshot) => {
+          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          setUploadProgressLogo(progress);
+        },
+        (error) => {
+          console.error('Erro no upload do logo:', error);
+          reject(new Error('Erro no upload do logo'));
+        },
+        () => {
+          getDownloadURL(uploadTaskLogo.snapshot.ref).then((downloadURL) => {
+            resolve(downloadURL);
+          });
+        }
+      );
+    });
   };
 
-  // Função para fazer upload do pitch via Cloud Function
-  const handlePitchUpload = async () => {
-    if (!pitch) return '';
-    try {
-      const reader = new FileReader();
-      const fileData = await new Promise((resolve, reject) => {
-        reader.onloadend = () => {
-          const base64data = reader.result.split(',')[1];
-          resolve(base64data);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(pitch);
-      });
-
-      const response = await fetch('https://us-central1-your-project.cloudfunctions.net/api/upload', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fileName: pitch.name,
-          fileData,
-          fileType: pitch.type,
-          userId: currentUser.uid,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro no upload do pitch');
+  // Função para fazer upload do pitch diretamente no Firebase Storage
+  const handlePitchUpload = () => {
+    return new Promise((resolve, reject) => {
+      if (!pitch) {
+        resolve(''); // Se não houver pitch para upload, retorna uma string vazia
+        return;
       }
 
-      const data = await response.json();
-      return data.url;
-    } catch (error) {
-      console.error('Erro ao fazer upload do pitch:', error);
-      throw error;
-    }
+      const fileName = `${Date.now()}_${pitch.name}`;
+      const storageRefPitch = ref(storage, `pitches/${currentUser.uid}/${fileName}`);
+      const uploadTaskPitch = uploadBytesResumable(storageRefPitch, pitch);
+
+      uploadTaskPitch.on('state_changed',
+        (snapshot) => {
+          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          setUploadProgressPitch(progress);
+        },
+        (error) => {
+          console.error('Erro no upload do pitch:', error);
+          reject(new Error('Erro no upload do pitch'));
+        },
+        () => {
+          getDownloadURL(uploadTaskPitch.snapshot.ref).then((downloadURL) => {
+            resolve(downloadURL);
+          });
+        }
+      );
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); // Resetar erro antes de tentar novamente
 
     let uploadedLogoURL = logoURL;
     let uploadedPitchURL = pitchURL;
@@ -151,7 +156,7 @@ function CompanyForm() {
         uploadedLogoURL = await handleLogoUpload();
         setLogoURL(uploadedLogoURL);
       } catch (error) {
-        alert('Ocorreu um erro ao fazer upload do logo. Tente novamente.');
+        setError('Ocorreu um erro ao fazer upload do logo. Tente novamente.');
         return;
       }
     }
@@ -162,7 +167,7 @@ function CompanyForm() {
         uploadedPitchURL = await handlePitchUpload();
         setPitchURL(uploadedPitchURL);
       } catch (error) {
-        alert('Ocorreu um erro ao fazer upload do pitch. Tente novamente.');
+        setError('Ocorreu um erro ao fazer upload do pitch. Tente novamente.');
         return;
       }
     }
@@ -185,12 +190,16 @@ function CompanyForm() {
 
     try {
       await setDoc(doc(db, 'companies', currentUser.uid), data, { merge: true });
-      setCompanyData(data);
-      setIsFormVisible(false);
+      setCompanyData(data); // Atualiza o estado com os dados salvos
+      setIsFormVisible(false); // Oculta o formulário após o envio
+      setUploadProgressLogo(0); // Reseta o progresso do upload do logo
+      setUploadProgressPitch(0); // Reseta o progresso do upload do pitch
+      setLogo(null); // Reseta o logo selecionado
+      setPitch(null); // Reseta o pitch selecionado
       alert('Empresa salva com sucesso!');
     } catch (error) {
       console.error('Erro ao salvar a empresa:', error);
-      alert('Erro ao salvar a empresa.');
+      setError('Erro ao salvar a empresa. Tente novamente.');
     }
   };
 
@@ -241,7 +250,7 @@ function CompanyForm() {
                 <label>Pitch da Startup (PDF):</label>
                 <input
                   type="file"
-                  accept=".pdf"
+                  accept="application/pdf"
                   onChange={(e) => handleFileChange(e, setPitch)}
                 />
                 {pitchURL && (
@@ -251,7 +260,6 @@ function CompanyForm() {
                 )}
               </div>
 
-              {/* Outros campos */}
               {/* Número de Funcionários */}
               <div className="form-group">
                 <label>Número de Funcionários:</label>
@@ -285,6 +293,7 @@ function CompanyForm() {
                   required
                   min="0"
                   max="100"
+                  step="0.01"
                 />
               </div>
 
@@ -297,6 +306,7 @@ function CompanyForm() {
                   onChange={(e) => setAnnualRevenue(e.target.value)}
                   required
                   min="0"
+                  step="0.01"
                 />
               </div>
 
@@ -343,6 +353,7 @@ function CompanyForm() {
                   onChange={(e) => setValuation(e.target.value)}
                   required
                   min="0"
+                  step="0.01"
                 />
               </div>
 
@@ -356,6 +367,22 @@ function CompanyForm() {
             <button onClick={handleEditAgain} className="btn-primary">Editar</button>
           </div>
         )}
+        {/* Exibir Progresso de Upload do Logo */}
+        {uploadProgressLogo > 0 && uploadProgressLogo < 100 && (
+          <div className="upload-progress">
+            <p>Upload do Logo: {uploadProgressLogo}%</p>
+            <progress value={uploadProgressLogo} max="100"></progress>
+          </div>
+        )}
+        {/* Exibir Progresso de Upload do Pitch */}
+        {uploadProgressPitch > 0 && uploadProgressPitch < 100 && (
+          <div className="upload-progress">
+            <p>Upload do Pitch: {uploadProgressPitch}%</p>
+            <progress value={uploadProgressPitch} max="100"></progress>
+          </div>
+        )}
+        {/* Exibir Erros */}
+        {error && <p className="error-message">{error}</p>}
       </div>
     </div>
   );

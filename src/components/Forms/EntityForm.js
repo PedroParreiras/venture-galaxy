@@ -5,6 +5,7 @@ import { auth, db, storage } from '../../firebase'; // Importando auth, db e sto
 import { useAuth } from '../../contexts/AuthContext';
 import './EntityForm.css';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"; // Importando funções do Storage
 import EntityCard from '../EntityCard/EntityCard'; // Importando o EntityCard
 
 function EntityForm() {
@@ -23,6 +24,8 @@ function EntityForm() {
   const [preferredValuation, setPreferredValuation] = useState('');
   const [logo, setLogo] = useState(null);
   const [logoURL, setLogoURL] = useState('');
+  const [uploadProgress, setUploadProgress] = useState(0); // Adicionado estado para progresso do upload
+  const [error, setError] = useState('');
 
   // Opções de Setores de Interesse
   const sectorOptions = [
@@ -57,17 +60,18 @@ function EntityForm() {
             setEntityData(data);
             setEntityName(data.name || '');
             setSectorInterest(data.sectorInterest || []);
-            setAum(data.aum || '');
-            setTicketSize(data.ticketSize || '');
-            setDryPowder(data.dryPowder || '');
+            setAum(data.aum ? data.aum.toString() : '');
+            setTicketSize(data.ticketSize ? data.ticketSize.toString() : '');
+            setDryPowder(data.dryPowder ? data.dryPowder.toString() : '');
             setPreferredStage(data.preferredStage || '');
-            setPreferredRevenue(data.preferredRevenue || '');
-            setPreferredValuation(data.preferredValuation || '');
+            setPreferredRevenue(data.preferredRevenue ? data.preferredRevenue.toString() : '');
+            setPreferredValuation(data.preferredValuation ? data.preferredValuation.toString() : '');
             setLogoURL(data.logoURL || '');
             setIsFormVisible(false);
           }
         } catch (error) {
           console.error('Erro ao buscar dados do investidor:', error);
+          setError('Erro ao buscar seus dados. Tente novamente mais tarde.');
         }
       }
     };
@@ -75,37 +79,39 @@ function EntityForm() {
     fetchEntityData();
   }, [currentUser]);
 
-  // Função para fazer upload do logo via Serverless Function com Autenticação
-  const handleLogoUpload = async () => {
-    if (!logo) return '';
-    const formData = new FormData();
-    formData.append('logo', logo);
-    formData.append('userId', currentUser.uid); // Passando o userId como campo
-
-    try {
-      const token = await auth.currentUser.getIdToken(); // Obtém o token de autenticação
-      const response = await fetch('/api/uploadLogo', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro no upload do logo');
+  // Função para fazer upload do logo diretamente no Firebase Storage
+  const handleLogoUpload = () => {
+    return new Promise((resolve, reject) => {
+      if (!logo) {
+        resolve(''); // Se não houver logo para upload, retorna uma string vazia
+        return;
       }
 
-      const data = await response.json();
-      return data.url;
-    } catch (error) {
-      console.error('Erro ao fazer upload do logo:', error);
-      throw error;
-    }
+      const fileName = `${Date.now()}_${logo.name}`;
+      const storageRef = ref(storage, `logos/${currentUser.uid}/${fileName}`);
+      const uploadTask = uploadBytesResumable(storageRef, logo);
+
+      uploadTask.on('state_changed',
+        (snapshot) => {
+          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          setUploadProgress(progress);
+        },
+        (error) => {
+          console.error('Erro no upload:', error);
+          reject(new Error('Erro no upload do logo'));
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            resolve(downloadURL);
+          });
+        }
+      );
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); // Resetar erro antes de tentar novamente
 
     let uploadedLogoURL = logoURL;
 
@@ -114,7 +120,7 @@ function EntityForm() {
         uploadedLogoURL = await handleLogoUpload();
         setLogoURL(uploadedLogoURL);
       } catch (error) {
-        alert('Ocorreu um erro ao fazer upload do logo. Tente novamente.');
+        setError('Ocorreu um erro ao fazer upload do logo. Tente novamente.');
         return;
       }
     }
@@ -136,10 +142,12 @@ function EntityForm() {
       await setDoc(doc(db, 'investors', currentUser.uid), data, { merge: true });
       setEntityData(data); // Atualiza o estado com os dados salvos
       setIsFormVisible(false); // Oculta o formulário após o envio
+      setUploadProgress(0); // Reseta o progresso do upload
+      setLogo(null); // Reseta o logo selecionado
       alert('Informações do investidor salvas com sucesso!');
     } catch (error) {
       console.error('Erro ao salvar as informações do investidor:', error);
-      alert('Erro ao salvar as informações.');
+      setError('Erro ao salvar as informações. Tente novamente.');
     }
   };
 
@@ -297,6 +305,15 @@ function EntityForm() {
             <button onClick={handleEditAgain} className="btn-primary">Responder Novamente</button>
           </div>
         )}
+        {/* Exibir Progresso de Upload */}
+        {uploadProgress > 0 && uploadProgress < 100 && (
+          <div className="upload-progress">
+            <p>Upload em andamento: {uploadProgress}%</p>
+            <progress value={uploadProgress} max="100"></progress>
+          </div>
+        )}
+        {/* Exibir Erros */}
+        {error && <p className="error-message">{error}</p>}
       </div>
     </div>
   );

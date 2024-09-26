@@ -1,27 +1,28 @@
 // src/firebase.js
 
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
-// Configuração do Firebase
+// Firebase configuration using environment variables
 const firebaseConfig = {
-  apiKey: 'AIzaSyAsQETcccN6H4UTzWFd_x9mLYriDs5YyHQ',
-  authDomain: 'venture-galaxy.firebaseapp.com',
-  projectId: 'venture-galaxy',
-  storageBucket: 'venture-galaxy.appspot.com',
-  messagingSenderId: '767580138374',
-  appId: '1:767580138374:web:e0261459e0d5d0a5281a07',
-  measurementId: 'G-L8GJ5219HL',
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
-// Inicializando o Firebase
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// Inicializando os serviços do Firebase
+const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-export { auth, db, storage };
+export { auth, db, storage, analytics };

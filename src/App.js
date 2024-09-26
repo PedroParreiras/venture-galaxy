@@ -1,4 +1,5 @@
 // src/App.js
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
@@ -10,15 +11,14 @@ import InvestorPage from './pages/InvestorPage';
 import CompanyPage from './pages/CompanyPage';
 import EntityForm from './components/Forms/EntityForm';
 import PrivateRoute from './components/PrivateRoute';
-import Dashboard from './pages/Dashboard'; // Importe o Dashboard
-import Header from './components/Header'; // Importa o Header
-
+import Dashboard from './pages/Dashboard'; // Import Dashboard
+import Header from './components/Header'; // Import Header
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-      <Header /> {/* Header será exibido em todas as páginas */}
+        <Header /> {/* Header will be displayed on all pages */}
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/signup" element={<Signup />} />
