@@ -1,25 +1,80 @@
-/* src/pages/InvestorPage.css */
-.investor-page {
-    padding: 20px;
-  }
-  
-  .investor-header {
-    display: flex;
-    justify-content: space-between;
+/* src/pages/HomePage.css */
+
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.homepage {
+  font-family: 'Roboto', sans-serif;
+  color: #f0f0f0;
+  background-color: #1e1e1e;
+}
+
+/* Stats Section */
+.stats-section {
+  padding: 40px 30px;
+  background-color: #2a2a2a;
+  text-align: center;
+}
+
+.stats-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #FF9348;
+}
+
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  flex-wrap: wrap;
+}
+
+.stats-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.stat-item {
+  background-color: #333;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.stat-item:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: #FF9348;
+}
+
+.stat-item h3 {
+  margin: 10px 0;
+  font-size: 1.2rem;
+  color: #f0f0f0;
+}
+
+.stat-item p {
+  font-size: 1.5rem;
+  color: #f0f0f0;
+  font-weight: bold;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .stats {
+    flex-direction: column;
     align-items: center;
   }
-  
-  .investor-header nav a {
-    margin: 0 10px;
-    text-decoration: none;
-    color: #007bff;
-  }
-  
-  .investor-header nav a:hover {
-    text-decoration: underline;
-  }
-  
-  .investor-main {
-    margin-top: 20px;
-  }
-  
+}

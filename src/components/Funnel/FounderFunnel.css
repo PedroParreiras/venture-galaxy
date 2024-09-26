@@ -1,0 +1,68 @@
+/* src/components/Funnel/FounderFunnel.css */
+
+.founder-funnel {
+    padding: 20px;
+    background-color: #2a2a2a;
+    border-radius: 12px;
+    color: #f0f0f0;
+  }
+  
+  .founder-funnel h2 {
+    color: #FF9348;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .investors-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .investor-card {
+    background-color: #333;
+    border-radius: 10px;
+    padding: 15px;
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s;
+  }
+  
+  .investor-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  }
+  
+  .investor-info {
+    margin-bottom: 10px;
+  }
+  
+  .investor-info h3 {
+    color: #FF9348;
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+  }
+  
+  .investor-info p {
+    font-size: 0.9rem;
+    color: #ccc;
+  }
+  
+  .investor-weight {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1rem;
+    color: #ffcc00;
+  }
+  
+  .star-icon {
+    color: #ffcc00;
+    font-size: 1.2rem;
+  }
+  
