@@ -35,7 +35,7 @@ function Login() {
     <div className="login-container">
       <div className="login-form">
         <h2>Entrar</h2>
-        {error && <div className="alert">{error}</div>}
+        {error && <div className="alert error">{error}</div>}
         <form onSubmit={handleLogin}>
           <div className="form-group">
             <label>Email:</label>
@@ -52,9 +52,14 @@ function Login() {
           </button>
         </form>
 
-        <p className="login-footer">
-          Não tem uma conta? <Link to="/signup">Cadastre-se</Link>
-        </p>
+        <div className="additional-links">
+          <p className="forgot-password-link">
+            <Link to="/forgot-password">Esqueceu sua senha?</Link>
+          </p>
+          <p className="login-footer">
+            Não tem uma conta? <Link to="/signup">Cadastre-se</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

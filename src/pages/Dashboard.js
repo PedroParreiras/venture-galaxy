@@ -5,13 +5,15 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import './Dashboard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faFunnelDollar } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faFunnelDollar, faMap, faBuilding } from '@fortawesome/free-solid-svg-icons'; // Adicionado faBuilding
 import CompanyForm from '../components/Forms/CompanyForm';
 import EntityForm from '../components/Forms/EntityForm';
 import FounderFunnel from '../components/Funnel/FounderFunnel';
 import InvestorFunnel from '../components/Funnel/InvestorFunnel';
 import CompanyCard from '../components/CompanyCard/CompanyCard';
 import EntityCard from '../components/EntityCard/EntityCard';
+import StartupInvestorMap from '../components/StartupInvestorMap/StartupInvestorMap'; // Importa o StartupInvestorMap
+import StartupMap from '../components/StartupMap/StartupMap'; // Importa o StartupMap
 
 function Dashboard() {
   const { currentUser } = useAuth();
@@ -31,7 +33,7 @@ function Dashboard() {
             setUserType(userDataFromDB.userType);
 
             if (userDataFromDB.userType === 'founder') {
-              const companyDocRef = doc(db, 'companies', currentUser.uid);
+              const companyDocRef = doc(db, 'founders', currentUser.uid); // Ajustado para 'founders'
               const companyDocSnap = await getDoc(companyDocRef);
               if (companyDocSnap.exists()) {
                 setUserData(companyDocSnap.data());
@@ -72,6 +74,10 @@ function Dashboard() {
       }
     } else if (view === 'user-funnel') {
       return userType === 'founder' ? <FounderFunnel /> : <InvestorFunnel />;
+    } else if (view === 'startup-investor-map') { // Condição para o StartupInvestorMap
+      return <StartupInvestorMap />;
+    } else if (view === 'startup-map') { // Condição para o StartupMap
+      return <StartupMap />;
     } else {
       return (
         <div className="placeholder">
@@ -100,6 +106,16 @@ function Dashboard() {
             <FontAwesomeIcon icon={faFunnelDollar} className="option-icon" />
             <h3>Funil do Usuário</h3>
             <p>Acompanhe o progresso do seu funil de atividades.</p>
+          </div>
+          <div className="option-card" onClick={() => setView('startup-investor-map')}> {/* Nova opção para o StartupInvestorMap */}
+            <FontAwesomeIcon icon={faMap} className="option-icon" />
+            <h3>Startup Investor Map</h3>
+            <p>Visualize o mapa de investidores por estágio preferido.</p>
+          </div>
+          <div className="option-card" onClick={() => setView('startup-map')}> {/* Nova opção para o StartupMap */}
+            <FontAwesomeIcon icon={faBuilding} className="option-icon" />
+            <h3>Startup Map</h3>
+            <p>Visualize o mapa de startups por estágio.</p>
           </div>
           {/* Adicione mais opções conforme necessário */}
         </div>

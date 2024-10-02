@@ -1,7 +1,7 @@
 // src/App.js
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import HomePage from './pages/HomePage';
 import Login from './components/Auth/Login';
@@ -13,57 +13,72 @@ import EntityForm from './components/Forms/EntityForm';
 import PrivateRoute from './components/PrivateRoute';
 import Dashboard from './pages/Dashboard'; // Import Dashboard
 import Header from './components/Header'; // Import Header
+import ForgotPassword from './components/Auth/ForgotPassword'; // Import ForgotPassword
+
+function AppRoutes() {
+  const location = useLocation();
+  // Define as rotas onde o Header não deve ser exibido
+  const noHeaderRoutes = ['/login', '/signup', '/forgot-password'];
+
+  return (
+    <>
+      {!noHeaderRoutes.includes(location.pathname) && <Header />} {/* Exibir Header condicionalmente */}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} /> {/* Nova rota para ForgotPassword */}
+        
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/founder-dashboard"
+          element={
+            <PrivateRoute>
+              <FounderPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/investor-dashboard"
+          element={
+            <PrivateRoute>
+              <InvestorPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/company/:companyId"
+          element={
+            <PrivateRoute>
+              <CompanyPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/entity-form"
+          element={
+            <PrivateRoute>
+              <EntityForm />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </>
+  );
+}
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <Header /> {/* Header will be displayed on all pages */}
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/founder-dashboard"
-            element={
-              <PrivateRoute>
-                <FounderPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/investor-dashboard"
-            element={
-              <PrivateRoute>
-                <InvestorPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/company/:companyId"
-            element={
-              <PrivateRoute>
-                <CompanyPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/entity-form"
-            element={
-              <PrivateRoute>
-                <EntityForm />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
+        <AppRoutes />
       </AuthProvider>
     </Router>
   );
