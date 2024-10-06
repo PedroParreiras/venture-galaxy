@@ -90,7 +90,7 @@ function Dashboard() {
   return (
     <div className="dashboard">
       <header className="dashboard-header">
-        <h1>Bem-vindo, {currentUser?.email || 'Usuário'}!</h1>
+        <h1>Welcome to the Orbit!</h1>
         <p>Seu painel personalizado para acompanhar suas atividades no Venture Galaxy.</p>
       </header>
 
@@ -109,12 +109,12 @@ function Dashboard() {
           </div>
           <div className="option-card" onClick={() => setView('startup-investor-map')}> {/* Nova opção para o StartupInvestorMap */}
             <FontAwesomeIcon icon={faMap} className="option-icon" />
-            <h3>Startup Investor Map</h3>
+            <h3>Brasil Startup Investor Map</h3>
             <p>Visualize o mapa de investidores por estágio preferido.</p>
           </div>
           <div className="option-card" onClick={() => setView('startup-map')}> {/* Nova opção para o StartupMap */}
             <FontAwesomeIcon icon={faBuilding} className="option-icon" />
-            <h3>Startup Map</h3>
+            <h3>Brasil Startup Map</h3>
             <p>Visualize o mapa de startups por estágio.</p>
           </div>
           {/* Adicione mais opções conforme necessário */}

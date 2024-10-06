@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.js
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../firebase';
 import {
@@ -9,7 +8,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore'; // Import getDoc
 
 const AuthContext = createContext();
 
@@ -23,7 +22,7 @@ export function AuthProvider({ children }) {
 
   async function signup(email, password, userType) {
     const result = await createUserWithEmailAndPassword(auth, email, password);
-    // Salvar informações adicionais no Firestore
+    // Save additional user information to Firestore
     await setDoc(doc(db, 'users', result.user.uid), {
       userType: userType,
       email: email,
@@ -38,14 +37,14 @@ export function AuthProvider({ children }) {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
 
-    // Verificar se o usuário já existe no Firestore
+    // Check if the user already exists in Firestore
     const userDocRef = doc(db, 'users', result.user.uid);
-    const userDoc = await userDocRef.get();
+    const userDoc = await getDoc(userDocRef); // Use getDoc from Firestore
 
     if (!userDoc.exists()) {
-      // Se o usuário não existir no Firestore, salve as informações adicionais
+      // If the user does not exist in Firestore, save additional information
       await setDoc(userDocRef, {
-        userType: 'googleUser', // Você pode ajustar isso conforme necessário
+        userType: 'googleUser', // Adjust userType as needed
         email: result.user.email,
       });
     }
@@ -70,7 +69,7 @@ export function AuthProvider({ children }) {
     login,
     signInWithGoogle,
     logout,
-    // Outras funções de autenticação
+    // Other auth-related functions
   };
 
   return (

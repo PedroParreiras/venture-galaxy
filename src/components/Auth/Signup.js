@@ -1,4 +1,3 @@
-// src/components/Auth/Signup.js
 import React, { useRef, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
@@ -34,13 +33,11 @@ function Signup() {
           userType: userTypeRef.current.value,
         });
 
-        // Show success popup
+        // Show success popup (optional)
         setShowSuccessPopup(true);
 
-        // Redirect to the dashboard after a short delay
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 2000); // Adjust delay time if needed
+        // Redirect to the dashboard immediately after successful signup
+        navigate('/dashboard');
       }
     } catch (error) {
       setError('Falha ao criar a conta');
