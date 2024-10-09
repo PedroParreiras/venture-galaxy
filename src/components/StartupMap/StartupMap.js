@@ -7,7 +7,7 @@ import { collection, onSnapshot } from 'firebase/firestore';
 // Títulos das seções
 const SECTIONS = [
     'Aceleração',
-    'Anjos',
+    'Anjo',
     'Pre-Seed',
     'Seed',
     'Série A',

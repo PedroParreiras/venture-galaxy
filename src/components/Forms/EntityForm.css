@@ -1,14 +1,14 @@
-/* src/components/Forms/EntityForm.css */
-
+/* Container for the entire form */
 .entity-form-container {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-height: 80vh;
   padding: 20px;
   background-color: #1e1e1e;
 }
 
+/* Main form styling */
 .entity-form {
   max-width: 800px;
   width: 100%;
@@ -19,15 +19,10 @@
   color: #f0f0f0;
   text-align: left;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
 }
 
-.entity-form h2 {
-  color: #FF9348;
-  margin-bottom: 30px;
-  font-size: 2rem;
-  text-align: center;
-}
-
+/* Form groups for individual input elements */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -35,12 +30,14 @@
   position: relative;
 }
 
+/* Label styling */
 .form-group label {
   margin-bottom: 10px;
   font-weight: bold;
   color: #FF9348;
 }
 
+/* Inputs and select fields */
 .form-group input[type="text"],
 .form-group input[type="number"],
 .form-group input[type="date"],
@@ -55,6 +52,7 @@
   font-size: 1rem;
 }
 
+/* Input focus styles */
 .form-group input[type="text"]:focus,
 .form-group input[type="number"]:focus,
 .form-group input[type="date"]:focus,
@@ -63,6 +61,7 @@
   border-color: #FF9348;
 }
 
+/* File input styling */
 .form-group input[type="file"] {
   border: none;
   background-color: transparent;
@@ -71,6 +70,7 @@
   padding: 8px 0;
 }
 
+/* File selector button */
 .form-group input[type="file"]::file-selector-button {
   background-color: #FF9348;
   color: #1e1e1e;
@@ -82,10 +82,12 @@
   margin-right: 10px;
 }
 
+/* File selector button hover effect */
 .form-group input[type="file"]::file-selector-button:hover {
   background-color: #e58336;
 }
 
+/* Preview image for uploaded logos */
 .preview-image {
   margin-top: 10px;
   max-width: 150px;
@@ -93,54 +95,48 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
+/* Checkbox group for multiple sectors of interest */
 .checkbox-group {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
 
+/* Checkbox label with spacing and layout */
 .checkbox-label {
   display: flex;
   align-items: center;
   cursor: pointer;
-  gap: 10px; /* Espaçamento entre a checkbox e o texto */
+  gap: 10px;
   color: #f0f0f0;
   font-weight: 500;
 }
 
+/* Custom checkbox styling */
 .checkbox-label input[type="checkbox"] {
-  /* Remove estilos padrão do navegador */
-  -webkit-appearance: none;
-  -moz-appearance: none;
   appearance: none;
-
-  /* Define tamanho fixo */
   width: 20px;
   height: 20px;
-
-  /* Estilos básicos */
   background-color: #1e1e1e;
   border: 2px solid #444;
-  border-radius: 4px; /* Pequeno arredondamento */
+  border-radius: 4px;
   position: relative;
-
-  /* Transições suaves */
   transition: background-color 0.3s, border-color 0.3s;
 }
 
-/* Estilo para o Estado Focado */
+/* Focus state for checkboxes */
 .checkbox-label input[type="checkbox"]:focus {
   outline: none;
   border-color: #FF9348;
 }
 
-/* Estilo para o Estado Marcado */
+/* Checked state for checkboxes */
 .checkbox-label input[type="checkbox"]:checked {
   background-color: #FF9348;
   border-color: #FF9348;
 }
 
-/* Adiciona o Checkmark Quando Marcado */
+/* Checkmark inside checkbox when checked */
 .checkbox-label input[type="checkbox"]:checked::after {
   content: "✔";
   position: absolute;
@@ -151,67 +147,70 @@
   font-size: 16px;
 }
 
-.entity-form button {
-  width: 100%;
-  padding: 14px 0;
+/* Buttons section, with Save and Cancel placed side by side */
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Save button - Now in orange */
+.form-buttons .btn-primary {
+  width: 48%;
+  padding: 14px;
   border: none;
   border-radius: 8px;
   background-color: #FF9348;
-  color: #1e1e1e;
+  color: white;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s;
   font-size: 1.1rem;
 }
 
-.entity-form button:hover {
+/* Hover effect for Save button */
+.form-buttons .btn-primary:hover {
   background-color: #e58336;
 }
 
-.entity-data-display {
-  padding: 30px;
-  background-color: #1e1e1e;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
-  text-align: left;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* Cancel button - Now in orange */
+.form-buttons .btn-secondary {
+  width: 48%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background-color: #FF9348;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 1.1rem;
 }
 
-.entity-data-display h2 {
-  color: #FF9348;
-  margin-bottom: 25px;
-  font-size: 2rem;
+/* Hover effect for Cancel button */
+.form-buttons .btn-secondary:hover {
+  background-color: #e58336;
+}
+
+/* Upload progress bar styling */
+.upload-progress {
+  margin-top: 20px;
   text-align: center;
 }
 
-.entity-data-display p {
-  margin-bottom: 15px;
-  color: #ccc;
-  font-size: 1rem;
+.upload-progress p {
+  color: #f0f0f0;
 }
 
-.entity-data-display .entity-logo {
-  width: 150px;
-  height: auto;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
-}
-
-.entity-data-display button {
-  margin-top: 30px;
+.upload-progress progress {
   width: 100%;
-  padding: 14px 0;
-  border: none;
-  border-radius: 8px;
-  background-color: #FF9348;
-  color: #1e1e1e;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  font-size: 1.1rem;
+  height: 20px;
 }
 
-.entity-data-display button:hover {
-  background-color: #e58336;
+/* Error message styling */
+.error-message {
+  color: #f44336;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 15px;
 }

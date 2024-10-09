@@ -1,141 +1,128 @@
-// src/components/EntityCard/EntityCard.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import './EntityCard.css';
-import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
+import EntityForm from '../Forms/EntityForm'; // Import the EntityForm component
 
-function EntityCard({ entity }) {
+function EntityCard({ entity, onEntityUpdate }) {
   const { currentUser } = useAuth();
+  const [showForm, setShowForm] = useState(false); // This state controls whether to show the form or not
 
-  // States to control editing of each field
-  const [editingField, setEditingField] = useState(null);
-  const [fieldValue, setFieldValue] = useState('');
-  const [sectorOptions] = useState([
-    'Agnostic', 'Adtech', 'Agtech', 'Biotech', 'Cannabis', 'Cibersecurity', 'Cleantech',
-    'Construtech', 'Datatech', 'Deeptech', 'Ecommerce', 'Edtech', 'Energytech', 'ESG',
-    'Femtech', 'Fintech', 'Foodtech', 'Games', 'Govtech', 'Healthtech', 'HRtech', 'Indtech',
-    'Insurtech', 'Legaltech', 'Logtech', 'MarketPlaces', 'Martech', 'Nanotech', 'Proptech',
-    'Regtech', 'Retailtech', 'Socialtech', 'Software', 'Sporttech', 'Web3', 'Space'
-  ]);
-  const [selectedSectors, setSelectedSectors] = useState(
-    Array.isArray(entity.sectorInterest)
-      ? entity.sectorInterest
-      : entity.sectorInterest
-      ? [entity.sectorInterest]
-      : []
-  );
-
-  // Function to handle sector selection
-  const handleSectorChange = (sector) => {
-    if (selectedSectors.includes(sector)) {
-      setSelectedSectors(selectedSectors.filter(item => item !== sector));
+  useEffect(() => {
+    // Log when the card is rendered and check if user is authorized
+    console.log('EntityCard rendered for entity:', entity.name);
+    if (entity.allowedEditors?.includes(currentUser?.uid)) {
+      console.log('Current user is authorized to edit:', currentUser?.uid);
     } else {
-      setSelectedSectors([...selectedSectors, sector]);
+      console.log('Current user is not authorized to edit');
+    }
+  }, [entity, currentUser]); // Only run this effect when the entity or currentUser changes
+
+  // Handler when the form is successfully submitted
+  const handleFormSubmit = (updatedEntity) => {
+    console.log('Form submitted with updated entity data:', updatedEntity);
+    setShowForm(false); // Close the form and return to the card view after submission
+    if (onEntityUpdate) {
+      onEntityUpdate(updatedEntity); // Notify parent component of updates
     }
   };
 
-  // Function to handle field edit submission
-  const handleEditSubmit = async (field) => {
-    try {
-      const docRef = doc(db, 'investors', currentUser.uid);
-      const updatedValue = field === 'sectorInterest' ? selectedSectors : parseFloat(fieldValue) || fieldValue;
-      await updateDoc(docRef, { [field]: updatedValue });
-      setEditingField(null);
-      window.location.reload(); // Refresh component after update
-    } catch (error) {
-      console.error('Error updating data:', error);
-      alert('Failed to update the data. Please try again.');
-    }
+  // Handler to cancel editing
+  const handleCancelEdit = () => {
+    console.log('Form editing canceled');
+    setShowForm(false); // Return to the card view without changes
   };
 
-  // Function to render each field with edit capability
-  const renderEditableField = (label, field, value, isCurrency = false) => (
-    <div className="entity-field">
-      <strong>{label}:</strong>
-      {editingField === field ? (
-        <>
-          {field === 'sectorInterest' ? (
-            <div className="sector-options">
-              {sectorOptions.map(option => (
-                <label key={option}>
-                  <input
-                    type="checkbox"
-                    value={option}
-                    checked={selectedSectors.includes(option)}
-                    onChange={() => handleSectorChange(option)}
-                  />
-                  {option}
-                </label>
-              ))}
-              <button
-                className="submit-button"
-                onClick={() => handleEditSubmit(field)}
-              >
-                Submit
-              </button>
-            </div>
+  // Log when the "Edit" button is clicked
+  const handleEditClick = () => {
+    console.log('Edit button clicked, showing form');
+    setShowForm(true);
+  };
+
+  // If `showForm` is true, render the form only and prevent the card from being shown
+  if (showForm) {
+    console.log('Rendering EntityForm for entity:', entity.name);
+    return (
+      <div className="entity-form-wrapper">
+        <EntityForm
+          entity={entity} // Pass the entity data to pre-fill the form
+          onSubmit={handleFormSubmit}
+          onCancel={handleCancelEdit}
+        />
+      </div>
+    );
+  }
+
+  // If `showForm` is false, render the card as normal
+  console.log('Rendering EntityCard for entity:', entity.name);
+  return (
+    <div className="entity-card-wrapper">
+      <div className="entity-card">
+        {/* Logo Section */}
+        <div className="entity-logo-container">
+          {entity.logoURL ? (
+            <img
+              src={entity.logoURL}
+              alt={`${entity.name} Logo`}
+              className="entity-logo"
+            />
           ) : (
-            <>
-              <input
-                type={isCurrency ? 'number' : 'text'}
-                value={fieldValue}
-                onChange={(e) => setFieldValue(e.target.value)}
-                autoFocus
-              />
-              <button
-                className="submit-button"
-                onClick={() => handleEditSubmit(field)}
-              >
-                Submit
-              </button>
-            </>
+            <div className="entity-logo-placeholder">Logo</div>
           )}
-        </>
-      ) : (
-        <>
-          <span>{isCurrency ? `R$ ${value.toLocaleString()}` : value}</span>
-          {/* Show the edit button only if the current user's email matches the founder's email */}
-          {currentUser?.email === entity.email && (
+        </div>
+
+        {/* Information Section */}
+        <div className="entity-info">
+          <h3 className="entity-name">{entity.name}</h3>
+          
+          {/* Website Link */}
+          {entity.website && (
+            <p><strong>Website:</strong> <a href={entity.website} target="_blank" rel="noopener noreferrer">{entity.website}</a></p>
+          )}
+          
+          <p><strong>Setores de Interesse:</strong> {entity.sectorInterest.join(', ')}</p>
+          <p><strong>AUM:</strong> R$ {entity.aum.toLocaleString()}</p>
+          <p><strong>Tamanho do Ticket:</strong> R$ {entity.ticketSize.toLocaleString()}</p>
+          <p><strong>Dry Powder:</strong> R$ {entity.dryPowder.toLocaleString()}</p>
+          <p><strong>Estágio Preferido:</strong> {entity.preferredStage}</p>
+          <p><strong>Receita Anual Preferida:</strong> R$ {entity.preferredRevenue.toLocaleString()}</p>
+          <p><strong>Valuation Preferido:</strong> R$ {entity.preferredValuation.toLocaleString()}</p>
+          {entity.response && (
+            <p><strong>Resposta:</strong> {entity.response}</p>
+          )}
+
+          {/* "Edit" Button */}
+          {entity.allowedEditors?.includes(currentUser?.uid) && (
             <button
               className="edit-button"
-              onClick={() => {
-                setEditingField(field);
-                setFieldValue(value);
-              }}
+              onClick={handleEditClick} // Switch to form view
             >
-              Edit
+              Editar
             </button>
           )}
-        </>
-      )}
-    </div>
-  );
-
-  return (
-    <div className="entity-card">
-      {/* Logo */}
-      <div className="entity-logo-container">
-        {entity.logoURL ? (
-          <img src={entity.logoURL} alt={`${entity.name} Logo`} className="entity-logo" />
-        ) : (
-          <div className="entity-logo-placeholder">Logo</div>
-        )}
-      </div>
-
-      {/* Information */}
-      <div className="entity-info">
-        <h3 className="entity-name">{entity.name}</h3>
-        {renderEditableField('Setores de Interesse', 'sectorInterest', selectedSectors.join(', '))}
-        {renderEditableField('AUM', 'aum', entity.aum, true)}
-        {renderEditableField('Tamanho do Ticket', 'ticketSize', entity.ticketSize, true)}
-        {renderEditableField('Dry Powder', 'dryPowder', entity.dryPowder, true)}
-        {renderEditableField('Estágio Preferido', 'preferredStage', entity.preferredStage)}
-        {renderEditableField('Receita Anual Preferida', 'preferredRevenue', entity.preferredRevenue, true)}
-        {renderEditableField('Valuation Preferido', 'preferredValuation', entity.preferredValuation, true)}
+        </div>
       </div>
     </div>
   );
 }
+
+EntityCard.propTypes = {
+  entity: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    sectorInterest: PropTypes.arrayOf(PropTypes.string).isRequired,
+    aum: PropTypes.number.isRequired,
+    ticketSize: PropTypes.number.isRequired,
+    dryPowder: PropTypes.number.isRequired,
+    preferredStage: PropTypes.string.isRequired,
+    preferredRevenue: PropTypes.number.isRequired,
+    preferredValuation: PropTypes.number.isRequired,
+    logoURL: PropTypes.string,
+    website: PropTypes.string, // Added website
+    allowedEditors: PropTypes.arrayOf(PropTypes.string).isRequired,
+    response: PropTypes.string,
+  }).isRequired,
+  onEntityUpdate: PropTypes.func,
+};
 
 export default EntityCard;
