@@ -1,19 +1,32 @@
 // src/pages/Dashboard.js
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import './Dashboard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faFunnelDollar, faMap, faBuilding } from '@fortawesome/free-solid-svg-icons'; // Adicionado faBuilding
+import {
+  faUser,
+  faFunnelDollar,
+  faMap,
+  faBuilding,
+  faRocket,
+  faHandHoldingUsd,
+  faQuestionCircle,
+} from '@fortawesome/free-solid-svg-icons';
 import CompanyForm from '../components/Forms/CompanyForm';
 import EntityForm from '../components/Forms/EntityForm';
 import FounderFunnel from '../components/Funnel/FounderFunnel';
 import InvestorFunnel from '../components/Funnel/InvestorFunnel';
 import CompanyCard from '../components/CompanyCard/CompanyCard';
 import EntityCard from '../components/EntityCard/EntityCard';
-import StartupInvestorMap from '../components/StartupInvestorMap/StartupInvestorMap'; // Importa o StartupInvestorMap
-import StartupMap from '../components/StartupMap/StartupMap'; // Importa o StartupMap
+import StartupInvestorMap from '../components/StartupInvestorMap/StartupInvestorMap';
+import StartupMap from '../components/StartupMap/StartupMap';
+import Modal from 'react-modal';
+
+// Set App Element for accessibility (required by react-modal)
+Modal.setAppElement('#root');
 
 function Dashboard() {
   const { currentUser } = useAuth();
@@ -21,6 +34,8 @@ function Dashboard() {
   const [userType, setUserType] = useState(null);
   const [hasData, setHasData] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [showUserTypePopup, setShowUserTypePopup] = useState(false);
+  const [showProfileIncompletePopup, setShowProfileIncompletePopup] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -30,27 +45,37 @@ function Dashboard() {
           const userDocSnap = await getDoc(userDocRef);
           if (userDocSnap.exists()) {
             const userDataFromDB = userDocSnap.data();
-            setUserType(userDataFromDB.userType);
 
-            if (userDataFromDB.userType === 'founder') {
-              const companyDocRef = doc(db, 'founders', currentUser.uid); // Ajustado para 'founders'
-              const companyDocSnap = await getDoc(companyDocRef);
-              if (companyDocSnap.exists()) {
-                setUserData(companyDocSnap.data());
-                setHasData(true);
-              } else {
-                setHasData(false);
+            if (userDataFromDB.userType) {
+              setUserType(userDataFromDB.userType);
+
+              if (userDataFromDB.userType === 'founder') {
+                const companyDocRef = doc(db, 'founders', currentUser.uid);
+                const companyDocSnap = await getDoc(companyDocRef);
+                if (companyDocSnap.exists()) {
+                  setUserData(companyDocSnap.data());
+                  setHasData(true);
+                } else {
+                  setHasData(false);
+                }
+              } else if (userDataFromDB.userType === 'investor') {
+                const entityDocRef = doc(db, 'investors', currentUser.uid);
+                const entityDocSnap = await getDoc(entityDocRef);
+                if (entityDocSnap.exists()) {
+                  setUserData(entityDocSnap.data());
+                  setHasData(true);
+                } else {
+                  setHasData(false);
+                }
               }
-            } else if (userDataFromDB.userType === 'investor') {
-              const entityDocRef = doc(db, 'investors', currentUser.uid);
-              const entityDocSnap = await getDoc(entityDocRef);
-              if (entityDocSnap.exists()) {
-                setUserData(entityDocSnap.data());
-                setHasData(true);
-              } else {
-                setHasData(false);
-              }
+            } else {
+              // If userType is not set, show the popup
+              setShowUserTypePopup(true);
             }
+          } else {
+            // If user document doesn't exist, create one without userType
+            await setDoc(userDocRef, { email: currentUser.email });
+            setShowUserTypePopup(true);
           }
         } catch (error) {
           console.error('Erro ao buscar dados do usuário:', error);
@@ -60,6 +85,27 @@ function Dashboard() {
 
     fetchUserData();
   }, [currentUser]);
+
+  const handleUserTypeSelect = async (type) => {
+    if (type) {
+      try {
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        await setDoc(userDocRef, { userType: type }, { merge: true });
+        setUserType(type);
+        setShowUserTypePopup(false);
+      } catch (error) {
+        console.error('Erro ao salvar o tipo de usuário:', error);
+      }
+    }
+  };
+
+  const handleFunnelClick = () => {
+    if (!hasData) {
+      setShowProfileIncompletePopup(true);
+    } else {
+      setView('user-funnel');
+    }
+  };
 
   const renderContent = () => {
     if (view === 'user-data') {
@@ -72,11 +118,9 @@ function Dashboard() {
       } else if (!hasData && userType) {
         return userType === 'founder' ? <CompanyForm /> : <EntityForm />;
       }
-    } else if (view === 'user-funnel') {
-      return userType === 'founder' ? <FounderFunnel /> : <InvestorFunnel />;
-    } else if (view === 'startup-investor-map') { // Condição para o StartupInvestorMap
+    } else if (view === 'startup-investor-map') {
       return <StartupInvestorMap />;
-    } else if (view === 'startup-map') { // Condição para o StartupMap
+    } else if (view === 'startup-map') {
       return <StartupMap />;
     } else {
       return (
@@ -94,7 +138,55 @@ function Dashboard() {
         <p>Seu painel personalizado para acompanhar suas atividades no Venture Galaxy.</p>
       </header>
 
-      {/* Opções do Dashboard */}
+      {/* User Type Popup */}
+      {showUserTypePopup && (
+        <div className="popup-overlay">
+          <div className="popup user-type-popup">
+            <h3>Selecione seu tipo de usuário</h3>
+            <div className="user-type-options">
+              <div
+                className="user-type-card"
+                onClick={() => handleUserTypeSelect('founder')}
+              >
+                <FontAwesomeIcon icon={faRocket} className="user-type-icon" />
+                <h4>Founder</h4>
+                <p>Eu represento uma startup.</p>
+              </div>
+              <div
+                className="user-type-card"
+                onClick={() => handleUserTypeSelect('investor')}
+              >
+                <FontAwesomeIcon icon={faHandHoldingUsd} className="user-type-icon" />
+                <h4>Investor</h4>
+                <p>Eu represento um investidor.</p>
+              </div>
+              <div
+                className="user-type-card"
+                onClick={() => handleUserTypeSelect('other')}
+              >
+                <FontAwesomeIcon icon={faQuestionCircle} className="user-type-icon" />
+                <h4>Other</h4>
+                <p>Outro tipo de usuário.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Profile Incomplete Popup */}
+      {showProfileIncompletePopup && (
+        <div className="popup-overlay">
+          <div className="popup profile-incomplete-popup">
+            <h3>Perfil Incompleto</h3>
+            <p>Por favor, complete seu perfil de {userType === 'founder' ? 'startup' : 'investidor'} para acessar o funil.</p>
+            <button className="close-popup-btn" onClick={() => setShowProfileIncompletePopup(false)}>
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Dashboard Options */}
       {userType && (
         <div className="dashboard-options">
           <div className="option-card" onClick={() => setView('user-data')}>
@@ -102,29 +194,26 @@ function Dashboard() {
             <h3>Dados do Usuário</h3>
             <p>Visualize e edite seus dados de usuário.</p>
           </div>
-          <div className="option-card" onClick={() => setView('user-funnel')}>
+          <div className="option-card" onClick={handleFunnelClick}>
             <FontAwesomeIcon icon={faFunnelDollar} className="option-icon" />
             <h3>Funil do Usuário</h3>
             <p>Acompanhe o progresso do seu funil de atividades.</p>
           </div>
-          <div className="option-card" onClick={() => setView('startup-investor-map')}> {/* Nova opção para o StartupInvestorMap */}
+          <div className="option-card" onClick={() => setView('startup-investor-map')}>
             <FontAwesomeIcon icon={faMap} className="option-icon" />
             <h3>Brasil Startup Investor Map</h3>
             <p>Visualize o mapa de investidores por estágio preferido.</p>
           </div>
-          <div className="option-card" onClick={() => setView('startup-map')}> {/* Nova opção para o StartupMap */}
+          <div className="option-card" onClick={() => setView('startup-map')}>
             <FontAwesomeIcon icon={faBuilding} className="option-icon" />
             <h3>Brasil Startup Map</h3>
             <p>Visualize o mapa de startups por estágio.</p>
           </div>
-          {/* Adicione mais opções conforme necessário */}
         </div>
       )}
 
-      {/* Conteúdo Principal */}
-      <main className="dashboard-content">
-        {renderContent()}
-      </main>
+      {/* Main Content */}
+      <main className="dashboard-content">{renderContent()}</main>
 
       <footer className="dashboard-footer">
         <p>&copy; {new Date().getFullYear()} Venture Galaxy. Todos os direitos reservados.</p>

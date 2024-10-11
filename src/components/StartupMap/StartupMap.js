@@ -1,8 +1,10 @@
 // src/components/StartupMap/StartupMap.js
+
 import React, { useEffect, useState } from 'react';
 import './StartupMap.css';
 import { db } from '../../firebase'; // Importa a instância do Firestore
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, doc, setDoc, increment } from 'firebase/firestore';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Títulos das seções
 const SECTIONS = [
@@ -17,6 +19,7 @@ const SECTIONS = [
 
 const StartupMap = () => {
     const [logos, setLogos] = useState([]);
+    const { currentUser } = useAuth();
 
     useEffect(() => {
         // Referência para a coleção 'companies'
@@ -53,10 +56,26 @@ const StartupMap = () => {
         return logos.filter(logo => determineCategory(logo) === category);
     };
 
-    // Debug: Verificar os dados das logos
-    useEffect(() => {
-        console.log("Companies Logos Carregadas:", logos);
-    }, [logos]);
+    // Função para lidar com o clique na logo
+    const handleLogoClick = async (logoId) => {
+        if (!currentUser) {
+            console.error("Usuário não está logado");
+            return;
+        }
+
+        const userId = currentUser.uid;
+        const logoClickDocRef = doc(db, 'logoClicks', `${userId}_${logoId}`);
+
+        try {
+            await setDoc(logoClickDocRef, {
+                userId: userId,
+                logoId: logoId,
+                count: increment(1)
+            }, { merge: true });
+        } catch (error) {
+            console.error("Erro ao atualizar o contador de cliques:", error);
+        }
+    };
 
     return (
         <div className="startup-map-container">
@@ -65,7 +84,7 @@ const StartupMap = () => {
                     <h2 className="section-title">{section}</h2>
                     <div className="logo-grid">
                         {getLogosByCategory(section).map(logo => (
-                            <div key={logo.id} className="logo-item">
+                            <div key={logo.id} className="logo-item" onClick={() => handleLogoClick(logo.id)}>
                                 <img src={logo.logoURL} alt={logo.name || 'Logo'} />
                             </div>
                         ))}

@@ -20,6 +20,7 @@ function CompanyCard({ company }) {
     'Insurtech', 'Legaltech', 'Logtech', 'MarketPlaces', 'Martech', 'Nanotech', 'Proptech',
     'Regtech', 'Retailtech', 'Socialtech', 'Software', 'Sporttech', 'Web3', 'Space'
   ];
+
   const stageOptions = [
     'Aceleração',
     'Anjo',
@@ -31,18 +32,27 @@ function CompanyCard({ company }) {
     'Pre-IPO'
   ];
 
+  const revenueIncomeOptions = ['B2C', 'B2B2C', 'B2G', 'P2P', 'O2O', 'C2S', 'Outro'];
+
   // Function to handle field edit submission
   const handleEditSubmit = async (field) => {
     try {
       const docRef = doc(db, 'companies', currentUser.uid);
       let updatedValue;
+
+      // Handle different field types
       if (field === 'creationDate') {
         updatedValue = fieldValue;
-      } else if (field === 'sector' || field === 'stage' || field === 'name') {
+      } else if (field === 'sector' || field === 'stage' || field === 'name' || field === 'originState') {
         updatedValue = fieldValue;
+      } else if (field === 'revenueIncome') {
+        updatedValue = fieldValue.split(',').map(item => item.trim());
+      } else if (field === 'companieAge') {
+        updatedValue = parseInt(fieldValue, 10);
       } else {
         updatedValue = parseFloat(fieldValue) || fieldValue;
       }
+
       await updateDoc(docRef, { [field]: updatedValue });
       setEditingField(null);
       window.location.reload(); // Refresh component after update
@@ -53,24 +63,53 @@ function CompanyCard({ company }) {
   };
 
   // Function to render each field with edit capability
-  const renderEditableField = (label, field, value, isCurrency = false, isDate = false, isPercentage = false, options = null) => (
+  const renderEditableField = (
+    label,
+    field,
+    value,
+    isCurrency = false,
+    isDate = false,
+    isPercentage = false,
+    options = null,
+    isMultiSelect = false
+  ) => (
     <div className="company-field">
       <strong>{label}:</strong>
       {editingField === field ? (
         <>
           {options ? (
-            <select
-              value={fieldValue}
-              onChange={(e) => setFieldValue(e.target.value)}
-              autoFocus
-            >
-              <option value="">Selecione</option>
-              {options.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            isMultiSelect ? (
+              <select
+                multiple
+                value={fieldValue}
+                onChange={(e) => {
+                  const selectedOptions = Array.from(e.target.selectedOptions).map(
+                    (option) => option.value
+                  );
+                  setFieldValue(selectedOptions);
+                }}
+                autoFocus
+              >
+                {options.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <select
+                value={fieldValue}
+                onChange={(e) => setFieldValue(e.target.value)}
+                autoFocus
+              >
+                <option value="">Selecione</option>
+                {options.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            )
           ) : (
             <input
               type={isCurrency || isPercentage ? 'number' : isDate ? 'date' : 'text'}
@@ -83,25 +122,30 @@ function CompanyCard({ company }) {
             className="submit-button"
             onClick={() => handleEditSubmit(field)}
           >
-            Submit
+            Salvar
           </button>
         </>
       ) : (
         <>
           <span>
-            {isCurrency ? `R$ ${parseFloat(value).toLocaleString()}` :
-             isPercentage ? `${value}%` :
-             isDate ? new Date(value).toLocaleDateString() :
-             value}
+            {isCurrency
+              ? `R$ ${parseFloat(value).toLocaleString()}`
+              : isPercentage
+              ? `${value}%`
+              : isDate
+              ? new Date(value).toLocaleDateString()
+              : Array.isArray(value)
+              ? value.join(', ')
+              : value}
           </span>
           <button
             className="edit-button"
             onClick={() => {
               setEditingField(field);
-              setFieldValue(value);
+              setFieldValue(Array.isArray(value) ? value : value.toString());
             }}
           >
-            Edit
+            Editar
           </button>
         </>
       )}
@@ -122,6 +166,19 @@ function CompanyCard({ company }) {
       {/* Informações da Empresa */}
       <div className="company-info">
         {renderEditableField('Nome da Startup', 'name', company.name)}
+        {renderEditableField('Website', 'website', company.website)}
+        {renderEditableField(
+          'Modelo de Receita',
+          'revenueIncome',
+          company.revenueIncome,
+          false,
+          false,
+          false,
+          revenueIncomeOptions,
+          true // Enable multi-select
+        )}
+        {renderEditableField('Estado de Origem', 'originState', company.originState)}
+        {renderEditableField('Anos de Operação', 'companieAge', company.companieAge)}
         {renderEditableField('Setor de Atuação', 'sector', company.sector, false, false, false, sectorOptions)}
         {renderEditableField('Número de Funcionários', 'employees', company.employees)}
         {renderEditableField('Data de Criação', 'creationDate', company.creationDate, false, true)}
@@ -129,6 +186,7 @@ function CompanyCard({ company }) {
         {renderEditableField('Receita Anual', 'annualRevenue', company.annualRevenue, true)}
         {renderEditableField('Valuation Atual', 'valuation', company.valuation, true)}
         {renderEditableField('Estágio', 'stage', company.stage, false, false, false, stageOptions)}
+        {renderEditableField('Investimento Necessário', 'fundingNeeded', company.fundingNeeded, true)}
         {company.pitchURL && (
           <p className="company-pitch">
             <strong>Pitch:</strong>{' '}

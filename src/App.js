@@ -11,9 +11,10 @@ import InvestorPage from './pages/InvestorPage';
 import CompanyPage from './pages/CompanyPage';
 import EntityForm from './components/Forms/EntityForm';
 import PrivateRoute from './components/PrivateRoute';
-import Dashboard from './pages/Dashboard'; // Import Dashboard
-import Header from './components/Header'; // Import Header
-import ForgotPassword from './components/Auth/ForgotPassword'; // Import ForgotPassword
+import Dashboard from './pages/Dashboard';
+import Header from './components/Header';
+import ForgotPassword from './components/Auth/ForgotPassword';
+import ImportInvestors from './pages/ImportInvestors'; // Importando o novo componente de importação de investidores
 
 function AppRoutes() {
   const location = useLocation();
@@ -69,6 +70,17 @@ function AppRoutes() {
             </PrivateRoute>
           }
         />
+
+        {/* Rota para Importar Investidores */}
+        <Route
+          path="/import-investors"
+          element={
+            <PrivateRoute>
+              <ImportInvestors />
+            </PrivateRoute>
+          }
+        />
+
       </Routes>
     </>
   );

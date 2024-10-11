@@ -1,40 +1,71 @@
+/* src/components/Forms/EntityForm.css */
+
+/* Root variables for consistent theming */
+:root {
+  --primary-color: #FF9348;
+  --primary-hover: #e58336;
+  --background-color: #0d0d0d;
+  --form-background: #1c1c1c;
+  --input-background: #2a2a2a;
+  --text-color: #f5f5f5;
+  --secondary-text-color: #cccccc;
+  --error-color: #f44336;
+  --border-radius: 8px;
+  --transition-speed: 0.3s;
+  --font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
 /* Container for the entire form */
 .entity-form-container {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  min-height: 80vh;
-  padding: 20px;
-  background-color: #1e1e1e;
+  min-height: 100vh;
+  padding: 60px 20px;
+  background-color: var(--background-color);
 }
 
 /* Main form styling */
 .entity-form {
   max-width: 800px;
   width: 100%;
-  background-color: #2a2a2a;
-  padding: 40px 50px;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
-  color: #f0f0f0;
-  text-align: left;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--form-background);
+  padding: 50px 60px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+  color: var(--text-color);
+  font-family: var(--font-family);
   position: relative;
+}
+
+/* Form title */
+.entity-form h2 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2.2rem;
+  color: var(--primary-color);
+  font-weight: bold;
 }
 
 /* Form groups for individual input elements */
 .form-group {
   display: flex;
   flex-direction: column;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
   position: relative;
 }
 
 /* Label styling */
 .form-group label {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   font-weight: bold;
-  color: #FF9348;
+  color: var(--primary-color);
+  font-size: 1rem;
 }
 
 /* Inputs and select fields */
@@ -43,13 +74,14 @@
 .form-group input[type="date"],
 .form-group select {
   width: 100%;
-  padding: 12px 15px;
-  border: 1px solid #444;
-  border-radius: 6px;
-  background-color: #1e1e1e;
-  color: #f0f0f0;
-  transition: border-color 0.3s;
+  padding: 14px 16px;
+  border: 1px solid #555;
+  border-radius: var(--border-radius);
+  background-color: var(--input-background);
+  color: var(--text-color);
+  transition: border-color var(--transition-speed), background-color var(--transition-speed);
   font-size: 1rem;
+  font-family: var(--font-family);
 }
 
 /* Input focus styles */
@@ -58,48 +90,59 @@
 .form-group input[type="date"]:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #FF9348;
+  border-color: var(--primary-color);
+  background-color: #242424;
+}
+
+/* Placeholder text styling */
+.form-group input::placeholder {
+  color: var(--secondary-text-color);
+  opacity: 0.8;
 }
 
 /* File input styling */
 .form-group input[type="file"] {
   border: none;
   background-color: transparent;
-  color: #FF9348;
+  color: var(--primary-color);
   cursor: pointer;
   padding: 8px 0;
+  font-size: 1rem;
+  font-family: var(--font-family);
 }
 
 /* File selector button */
 .form-group input[type="file"]::file-selector-button {
-  background-color: #FF9348;
+  background-color: var(--primary-color);
   color: #1e1e1e;
   border: none;
-  padding: 8px 12px;
-  border-radius: 5px;
+  padding: 10px 16px;
+  border-radius: var(--border-radius);
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color var(--transition-speed);
   margin-right: 10px;
+  font-weight: bold;
 }
 
 /* File selector button hover effect */
 .form-group input[type="file"]::file-selector-button:hover {
-  background-color: #e58336;
+  background-color: var(--primary-hover);
 }
 
 /* Preview image for uploaded logos */
 .preview-image {
-  margin-top: 10px;
+  margin-top: 15px;
   max-width: 150px;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
 
 /* Checkbox group for multiple sectors of interest */
 .checkbox-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
+  margin-top: 10px;
 }
 
 /* Checkbox label with spacing and layout */
@@ -107,110 +150,174 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  gap: 10px;
-  color: #f0f0f0;
+  gap: 8px;
+  color: var(--text-color);
   font-weight: 500;
 }
 
 /* Custom checkbox styling */
 .checkbox-label input[type="checkbox"] {
   appearance: none;
-  width: 20px;
-  height: 20px;
-  background-color: #1e1e1e;
-  border: 2px solid #444;
+  width: 18px;
+  height: 18px;
+  background-color: var(--input-background);
+  border: 2px solid #555;
   border-radius: 4px;
   position: relative;
-  transition: background-color 0.3s, border-color 0.3s;
+  transition: background-color var(--transition-speed), border-color var(--transition-speed);
+  cursor: pointer;
 }
 
 /* Focus state for checkboxes */
 .checkbox-label input[type="checkbox"]:focus {
   outline: none;
-  border-color: #FF9348;
+  border-color: var(--primary-color);
 }
 
 /* Checked state for checkboxes */
 .checkbox-label input[type="checkbox"]:checked {
-  background-color: #FF9348;
-  border-color: #FF9348;
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 /* Checkmark inside checkbox when checked */
 .checkbox-label input[type="checkbox"]:checked::after {
-  content: "✔";
+  content: "";
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #1e1e1e;
-  font-size: 16px;
+  top: 2px;
+  left: 6px;
+  width: 4px;
+  height: 8px;
+  border: solid #1e1e1e;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
-/* Buttons section, with Save and Cancel placed side by side */
+/* Buttons section */
 .form-buttons {
   display: flex;
   justify-content: space-between;
   gap: 20px;
+  margin-top: 40px;
 }
 
-/* Save button - Now in orange */
+/* Save button */
 .form-buttons .btn-primary {
-  width: 48%;
-  padding: 14px;
+  flex: 1;
+  padding: 16px;
   border: none;
-  border-radius: 8px;
-  background-color: #FF9348;
-  color: white;
+  border-radius: var(--border-radius);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+  color: #1e1e1e;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
   font-size: 1.1rem;
 }
 
 /* Hover effect for Save button */
 .form-buttons .btn-primary:hover {
-  background-color: #e58336;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(255, 147, 72, 0.4);
 }
 
-/* Cancel button - Now in orange */
+/* Cancel button */
 .form-buttons .btn-secondary {
-  width: 48%;
-  padding: 14px;
-  border: none;
-  border-radius: 8px;
-  background-color: #FF9348;
-  color: white;
+  flex: 1;
+  padding: 16px;
+  border: 2px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  background-color: transparent;
+  color: var(--primary-color);
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color var(--transition-speed), color var(--transition-speed);
   font-size: 1.1rem;
 }
 
 /* Hover effect for Cancel button */
 .form-buttons .btn-secondary:hover {
-  background-color: #e58336;
+  background-color: var(--primary-color);
+  color: #1e1e1e;
 }
 
 /* Upload progress bar styling */
 .upload-progress {
-  margin-top: 20px;
+  margin-top: 25px;
   text-align: center;
 }
 
 .upload-progress p {
-  color: #f0f0f0;
+  color: var(--text-color);
+  margin-bottom: 10px;
 }
 
 .upload-progress progress {
   width: 100%;
   height: 20px;
+  appearance: none;
+}
+
+.upload-progress progress::-webkit-progress-bar {
+  background-color: #2a2a2a;
+  border-radius: var(--border-radius);
+}
+
+.upload-progress progress::-webkit-progress-value {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+  border-radius: var(--border-radius);
 }
 
 /* Error message styling */
 .error-message {
-  color: #f44336;
-  font-size: 0.9rem;
+  color: var(--error-color);
+  font-size: 1rem;
   text-align: center;
-  margin-top: 15px;
+  margin-top: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .entity-form {
+    padding: 30px 20px;
+  }
+
+  .form-buttons {
+    flex-direction: column;
+  }
+
+  .form-buttons .btn-primary,
+  .form-buttons .btn-secondary {
+    width: 100%;
+  }
+}
+
+/* Tooltip styling for additional info */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  color: var(--primary-color);
+}
+
+.tooltip .tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: #333;
+  color: var(--text-color);
+  text-align: center;
+  border-radius: var(--border-radius);
+  padding: 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%; /* Position above the icon */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity var(--transition-speed);
+}
+
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
 }

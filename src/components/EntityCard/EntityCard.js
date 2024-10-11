@@ -80,6 +80,7 @@ function EntityCard({ entity, onEntityUpdate }) {
             <p><strong>Website:</strong> <a href={entity.website} target="_blank" rel="noopener noreferrer">{entity.website}</a></p>
           )}
           
+          {/* Additional Fields */}
           <p><strong>Setores de Interesse:</strong> {entity.sectorInterest.join(', ')}</p>
           <p><strong>AUM:</strong> R$ {entity.aum.toLocaleString()}</p>
           <p><strong>Tamanho do Ticket:</strong> R$ {entity.ticketSize.toLocaleString()}</p>
@@ -87,6 +88,17 @@ function EntityCard({ entity, onEntityUpdate }) {
           <p><strong>Estágio Preferido:</strong> {entity.preferredStage}</p>
           <p><strong>Receita Anual Preferida:</strong> R$ {entity.preferredRevenue.toLocaleString()}</p>
           <p><strong>Valuation Preferido:</strong> R$ {entity.preferredValuation.toLocaleString()}</p>
+          <p><strong>Modelo de Receita:</strong> {entity.revenueIncome.join(', ')}</p>
+          <p><strong>Estado de Origem:</strong> {entity.originState}</p>
+          <p><strong>Anos de Operação:</strong> {entity.companieAge} anos</p>
+          
+          {/* Pitch Deck Link */}
+          {entity.pitchDeckURL && (
+            <p>
+              <strong>Pitch Deck:</strong> <a href={entity.pitchDeckURL} target="_blank" rel="noopener noreferrer">Visualizar Pitch Deck</a>
+            </p>
+          )}
+          
           {entity.response && (
             <p><strong>Resposta:</strong> {entity.response}</p>
           )}
@@ -121,6 +133,10 @@ EntityCard.propTypes = {
     website: PropTypes.string, // Added website
     allowedEditors: PropTypes.arrayOf(PropTypes.string).isRequired,
     response: PropTypes.string,
+    revenueIncome: PropTypes.arrayOf(PropTypes.string).isRequired,
+    originState: PropTypes.string.isRequired,
+    companieAge: PropTypes.number.isRequired,
+    pitchDeckURL: PropTypes.string,
   }).isRequired,
   onEntityUpdate: PropTypes.func,
 };

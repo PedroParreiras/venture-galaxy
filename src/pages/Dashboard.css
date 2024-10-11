@@ -1,112 +1,83 @@
 /* src/pages/Dashboard.css */
 
-.dashboard {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-color: #121212;
-  color: #f0f0f0;
-}
+/* Existing styles... */
 
-.dashboard-header {
-  text-align: center;
-  padding: 40px 20px;
-  background-color: #1e1e1e;
-  border-bottom: 2px solid #FF9348;
-}
-
-.dashboard-header h1 {
-  font-size: 2.5rem;
-  color: #FF9348;
-  margin-bottom: 10px;
-}
-
-.dashboard-header p {
-  font-size: 1.2rem;
-  color: #ccc;
-}
-
-.dashboard-options {
+/* Styles for the User Type Popup */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(18, 18, 18, 0.95);
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 20px;
-  padding: 30px 20px;
+  align-items: center;
+  z-index: 1000;
 }
 
-.option-card {
+.popup {
+  background-color: #1e1e1e;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.popup h3 {
+  color: #FF9348;
+  margin-bottom: 20px;
+}
+
+.user-type-options {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.user-type-card {
   background-color: #2a2a2a;
   border-radius: 12px;
-  width: 250px;
+  width: 150px;
   padding: 20px;
   text-align: center;
   cursor: pointer;
   transition: transform 0.3s, box-shadow 0.3s;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.option-card:hover {
+.user-type-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
-.option-icon {
+.user-type-icon {
   font-size: 2rem;
   color: #FF9348;
   margin-bottom: 15px;
 }
 
-.option-card h3 {
-  font-size: 1.3rem;
+.user-type-card h4 {
+  font-size: 1.2rem;
   margin-bottom: 10px;
   color: #FF9348;
 }
 
-.option-card p {
-  font-size: 1rem;
+.user-type-card p {
+  font-size: 0.9rem;
   color: #ccc;
 }
 
-.dashboard-content {
-  flex: 1;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+/* Adjust popup for smaller screens */
+@media (max-width: 600px) {
+  .user-type-options {
+    flex-direction: column;
+    align-items: center;
+  }
 
-.placeholder {
-  text-align: center;
-  color: #ccc;
-  font-size: 1.2rem;
+  .user-type-card {
+    width: 80%;
+  }
 }
-
-.dashboard-footer {
-  text-align: center;
-  padding: 20px;
-  background-color: #1e1e1e;
-  border-top: 2px solid #FF9348;
-}
-
-.dashboard-footer p {
-  margin: 0;
-  font-size: 1rem;
-  color: #ccc;
-}
-
-/* Estilos para o botão de edição nos cards */
-.edit-button {
-  margin-top: 15px;
-  padding: 10px 20px;
-  background-color: #FF9348;
-  color: #1e1e1e;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.edit-button:hover {
-  background-color: #e58336;
-}
-

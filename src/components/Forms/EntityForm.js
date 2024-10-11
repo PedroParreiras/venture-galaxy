@@ -1,14 +1,16 @@
+// src/components/Forms/EntityForm.js
+
 import React, { useState, useEffect } from 'react';
-import { db, storage } from '../../firebase'; // Removed unused `auth` import
+import { db, storage } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import './EntityForm.css';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"; // Firebase Storage functions
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 function EntityForm({ entity, onSubmit, onCancel }) {
   const { currentUser } = useAuth();
 
-  // States for form fields
+  // Estados para os campos do formulário
   const [entityName, setEntityName] = useState('');
   const [sectorInterest, setSectorInterest] = useState([]);
   const [aum, setAum] = useState('');
@@ -19,11 +21,14 @@ function EntityForm({ entity, onSubmit, onCancel }) {
   const [preferredValuation, setPreferredValuation] = useState('');
   const [logo, setLogo] = useState(null);
   const [logoURL, setLogoURL] = useState('');
-  const [website, setWebsite] = useState(''); // New state for website
+  const [website, setWebsite] = useState('');
+  const [revenueIncome, setRevenueIncome] = useState([]);
+  const [originState, setOriginState] = useState('');
+  const [companieAge, setCompanieAge] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState('');
 
-  // Sector and stage options
+  // Opções de setores e estágios
   const sectorOptions = [
     'Agnostic', 'Adtech', 'Agtech', 'Biotech', 'Cannabis', 'Cibersecurity', 'Cleantech',
     'Construtech', 'Datatech', 'Deeptech', 'Ecommerce', 'Edtech', 'Energytech', 'ESG',
@@ -36,7 +41,9 @@ function EntityForm({ entity, onSubmit, onCancel }) {
     'Aceleração', 'Anjo', 'Pre-Seed', 'Seed', 'Série A', 'Série B', 'Série C', 'Pre-IPO'
   ];
 
-  // Fetch entity data from Firestore
+  const revenueIncomeOptions = ['B2C', 'B2B2C', 'B2G', 'P2P', 'O2O', 'C2S', 'Outro'];
+
+  // Buscar dados da entidade no Firestore
   useEffect(() => {
     const fetchEntityData = async () => {
       if (currentUser && entity) {
@@ -54,18 +61,21 @@ function EntityForm({ entity, onSubmit, onCancel }) {
             setPreferredRevenue(data.preferredRevenue?.toString() || '');
             setPreferredValuation(data.preferredValuation?.toString() || '');
             setLogoURL(data.logoURL || '');
-            setWebsite(data.website || ''); // Pre-fill website if available
+            setWebsite(data.website || '');
+            setRevenueIncome(data.revenueIncome || []);
+            setOriginState(data.originState || '');
+            setCompanieAge(data.companieAge?.toString() || '');
           }
         } catch (error) {
-          console.error('Error fetching investor data:', error);
-          setError('Failed to load data. Please try again later.');
+          console.error('Erro ao buscar dados do investidor:', error);
+          setError('Falha ao carregar os dados. Por favor, tente novamente mais tarde.');
         }
       }
     };
     fetchEntityData();
   }, [currentUser, entity]);
 
-  // Handle logo upload to Firebase Storage
+  // Fazer upload do logo para o Firebase Storage
   const handleLogoUpload = () => {
     return new Promise((resolve, reject) => {
       if (!logo) resolve('');
@@ -80,8 +90,8 @@ function EntityForm({ entity, onSubmit, onCancel }) {
           setUploadProgress(progress);
         },
         (error) => {
-          console.error('Upload error:', error);
-          reject(new Error('Logo upload failed'));
+          console.error('Erro no upload:', error);
+          reject(new Error('Falha no upload do logo'));
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then(resolve);
@@ -101,7 +111,7 @@ function EntityForm({ entity, onSubmit, onCancel }) {
         uploadedLogoURL = await handleLogoUpload();
         setLogoURL(uploadedLogoURL);
       } catch (error) {
-        setError('Failed to upload logo. Try again.');
+        setError('Falha ao fazer upload do logo. Tente novamente.');
         return;
       }
     }
@@ -116,18 +126,21 @@ function EntityForm({ entity, onSubmit, onCancel }) {
       preferredRevenue: parseFloat(preferredRevenue),
       preferredValuation: parseFloat(preferredValuation),
       logoURL: uploadedLogoURL || '',
-      website, // Include website in saved data
+      website,
+      revenueIncome,
+      originState,
+      companieAge: parseInt(companieAge),
       allowedEditors: [currentUser.uid],
     };
 
     try {
       await setDoc(doc(db, 'investors', currentUser.uid), data, { merge: true });
-      onSubmit(data); // Pass updated data to the parent component
+      onSubmit(data); // Passa os dados atualizados para o componente pai
       setUploadProgress(0);
       setLogo(null);
     } catch (error) {
-      console.error('Error saving entity data:', error);
-      setError('Error saving data. Try again.');
+      console.error('Erro ao salvar os dados da entidade:', error);
+      setError('Erro ao salvar os dados. Tente novamente.');
     }
   };
 
@@ -138,16 +151,16 @@ function EntityForm({ entity, onSubmit, onCancel }) {
   return (
     <div className="entity-form-container">
       <form onSubmit={handleSubmit}>
-        {/* Logo Upload */}
+        {/* Upload do Logo */}
         <div className="form-group">
-          <label>Entity Logo:</label>
+          <label>Logo da Entidade:</label>
           <input type="file" accept="image/*" onChange={handleFileChange} />
-          {logoURL && <img src={logoURL} alt="Entity Logo" className="preview-image" />}
+          {logoURL && <img src={logoURL} alt="Logo da Entidade" className="preview-image" />}
         </div>
 
-        {/* Entity Name */}
+        {/* Nome da Entidade */}
         <div className="form-group">
-          <label>Entity Name:</label>
+          <label>Nome da Entidade:</label>
           <input
             type="text"
             value={entityName}
@@ -167,9 +180,9 @@ function EntityForm({ entity, onSubmit, onCancel }) {
           />
         </div>
 
-        {/* Sector Interest */}
+        {/* Setores de Interesse */}
         <div className="form-group">
-          <label>Sector Interest:</label>
+          <label>Setores de Interesse:</label>
           <div className="checkbox-group">
             {sectorOptions.map((option) => (
               <label key={option} className="checkbox-label">
@@ -188,9 +201,53 @@ function EntityForm({ entity, onSubmit, onCancel }) {
           </div>
         </div>
 
+        {/* Modelo de Receita */}
+        <div className="form-group">
+          <label>Modelo de Receita Preferido:</label>
+          <div className="checkbox-group">
+            {revenueIncomeOptions.map((option) => (
+              <label key={option} className="checkbox-label">
+                <input
+                  type="checkbox"
+                  value={option}
+                  checked={revenueIncome.includes(option)}
+                  onChange={(e) => {
+                    const { value, checked } = e.target;
+                    setRevenueIncome(checked ? [...revenueIncome, value] : revenueIncome.filter(item => item !== value));
+                  }}
+                />
+                {option}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Estado de Origem */}
+        <div className="form-group">
+          <label>Estado de Origem:</label>
+          <input
+            type="text"
+            value={originState}
+            onChange={(e) => setOriginState(e.target.value)}
+            required
+          />
+        </div>
+
+        {/* Idade da Empresa */}
+        <div className="form-group">
+          <label>Idade Preferida da Startup (anos de operação):</label>
+          <input
+            type="number"
+            value={companieAge}
+            onChange={(e) => setCompanieAge(e.target.value)}
+            required
+            min="0"
+          />
+        </div>
+
         {/* AUM */}
         <div className="form-group">
-          <label>AUM (Assets Under Management):</label>
+          <label>AUM da Entidade (Ativos sob Gestão):</label>
           <input
             type="number"
             value={aum}
@@ -201,9 +258,9 @@ function EntityForm({ entity, onSubmit, onCancel }) {
           />
         </div>
 
-        {/* Ticket Size */}
+        {/* Tamanho do Ticket */}
         <div className="form-group">
-          <label>Ticket Size:</label>
+          <label>Tamanho do Ticket da Entidade:</label>
           <input
             type="number"
             value={ticketSize}
@@ -216,7 +273,7 @@ function EntityForm({ entity, onSubmit, onCancel }) {
 
         {/* Dry Powder */}
         <div className="form-group">
-          <label>Dry Powder:</label>
+          <label>Dry Powder da Entidade:</label>
           <input
             type="number"
             value={dryPowder}
@@ -227,15 +284,15 @@ function EntityForm({ entity, onSubmit, onCancel }) {
           />
         </div>
 
-        {/* Preferred Stage */}
+        {/* Estágio Preferido */}
         <div className="form-group">
-          <label>Preferred Stage:</label>
+          <label>Estágio Preferido:</label>
           <select
             value={preferredStage}
             onChange={(e) => setPreferredStage(e.target.value)}
             required
           >
-            <option value="">Select</option>
+            <option value="">Selecione</option>
             {stageOptions.map(stage => (
               <option key={stage} value={stage}>
                 {stage}
@@ -244,9 +301,9 @@ function EntityForm({ entity, onSubmit, onCancel }) {
           </select>
         </div>
 
-        {/* Preferred Revenue */}
+        {/* Receita Anual Preferida */}
         <div className="form-group">
-          <label>Preferred Annual Revenue:</label>
+          <label>Receita Anual Preferida:</label>
           <input
             type="number"
             value={preferredRevenue}
@@ -257,9 +314,9 @@ function EntityForm({ entity, onSubmit, onCancel }) {
           />
         </div>
 
-        {/* Preferred Valuation */}
+        {/* Valuation Preferido */}
         <div className="form-group">
-          <label>Preferred Valuation:</label>
+          <label>Valuation Preferido:</label>
           <input
             type="number"
             value={preferredValuation}
@@ -270,22 +327,22 @@ function EntityForm({ entity, onSubmit, onCancel }) {
           />
         </div>
 
-        {/* Save Button */}
+        {/* Botões de Ação */}
         <div className="form-buttons">
-          <button type="submit" className="btn-primary">Save</button>
-          <button type="button" className="btn-secondary" onClick={onCancel}>Cancel</button>
+          <button type="submit" className="btn-primary">Salvar</button>
+          <button type="button" className="btn-secondary" onClick={onCancel}>Cancelar</button>
         </div>
       </form>
 
-      {/* Upload Progress */}
+      {/* Progresso do Upload do Logo */}
       {uploadProgress > 0 && uploadProgress < 100 && (
         <div className="upload-progress">
-          <p>Upload in progress: {uploadProgress}%</p>
+          <p>Upload do logo em andamento: {uploadProgress}%</p>
           <progress value={uploadProgress} max="100"></progress>
         </div>
       )}
 
-      {/* Error Message */}
+      {/* Mensagem de Erro */}
       {error && <p className="error-message">{error}</p>}
     </div>
   );

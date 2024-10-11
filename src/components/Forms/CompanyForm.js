@@ -1,19 +1,19 @@
 // src/components/Forms/CompanyForm.js
 
 import React, { useState, useEffect } from 'react';
-import { db, storage } from '../../firebase'; // Importando db e storage
+import { db, storage } from '../../firebase'; // Importing db and storage
 import { useAuth } from '../../contexts/AuthContext';
 import './CompanyForm.css';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"; // Importando funções do Storage
-import CompanyCard from '../CompanyCard/CompanyCard'; // Importando o CompanyCard
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'; // Importing Storage functions
+import CompanyCard from '../CompanyCard/CompanyCard'; // Importing CompanyCard
 
 function CompanyForm() {
   const { currentUser } = useAuth();
   const [companyData, setCompanyData] = useState(null);
   const [isFormVisible, setIsFormVisible] = useState(true);
 
-  // Estados para os campos do formulário
+  // States for form fields
   const [companyName, setCompanyName] = useState('');
   const [sector, setSector] = useState('');
   const [fundingNeeded, setFundingNeeded] = useState('');
@@ -27,11 +27,17 @@ function CompanyForm() {
   const [logoURL, setLogoURL] = useState('');
   const [pitch, setPitch] = useState(null);
   const [pitchURL, setPitchURL] = useState('');
-  const [uploadProgressLogo, setUploadProgressLogo] = useState(0); // Estado para progresso do logo
-  const [uploadProgressPitch, setUploadProgressPitch] = useState(0); // Estado para progresso do pitch
+  const [uploadProgressLogo, setUploadProgressLogo] = useState(0);
+  const [uploadProgressPitch, setUploadProgressPitch] = useState(0);
   const [error, setError] = useState('');
 
-  // Opções de setores e estágios
+  // New state variables for additional fields
+  const [revenueIncome, setRevenueIncome] = useState([]);
+  const [originState, setOriginState] = useState('');
+  const [companieAge, setCompanieAge] = useState('');
+  const [website, setWebsite] = useState(''); // Added website state variable
+
+  // Options for sectors, stages, and revenue income
   const sectorOptions = [
     'Agnostic', 'Adtech', 'Agtech', 'Biotech', 'Cannabis', 'Cibersecurity', 'Cleantech',
     'Construtech', 'Datatech', 'Deeptech', 'Ecommerce', 'Edtech', 'Energytech', 'ESG',
@@ -49,8 +55,9 @@ function CompanyForm() {
     'Série C',
     'Pre-IPO'
   ];
+  const revenueIncomeOptions = ['B2C', 'B2B2C', 'B2G', 'P2P', 'O2O', 'C2S', 'Outro'];
 
-  // Função para buscar os dados da empresa do Firestore
+  // Fetch company data from Firestore
   useEffect(() => {
     const fetchCompanyData = async () => {
       if (currentUser) {
@@ -71,6 +78,10 @@ function CompanyForm() {
             setStage(data.stage || '');
             setLogoURL(data.logoURL || '');
             setPitchURL(data.pitchURL || '');
+            setRevenueIncome(data.revenueIncome || []);
+            setOriginState(data.originState || '');
+            setCompanieAge(data.companieAge ? data.companieAge.toString() : '');
+            setWebsite(data.website || ''); // Set website state
             setIsFormVisible(false);
           }
         } catch (error) {
@@ -83,11 +94,11 @@ function CompanyForm() {
     fetchCompanyData();
   }, [currentUser]);
 
-  // Função para fazer upload do logo diretamente no Firebase Storage
+  // Function to upload logo to Firebase Storage
   const handleLogoUpload = () => {
     return new Promise((resolve, reject) => {
       if (!logo) {
-        resolve(''); // Se não houver logo para upload, retorna uma string vazia
+        resolve('');
         return;
       }
 
@@ -95,9 +106,12 @@ function CompanyForm() {
       const storageRefLogo = ref(storage, `logos/${currentUser.uid}/${fileName}`);
       const uploadTaskLogo = uploadBytesResumable(storageRefLogo, logo);
 
-      uploadTaskLogo.on('state_changed',
+      uploadTaskLogo.on(
+        'state_changed',
         (snapshot) => {
-          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
           setUploadProgressLogo(progress);
         },
         (error) => {
@@ -113,11 +127,11 @@ function CompanyForm() {
     });
   };
 
-  // Função para fazer upload do pitch diretamente no Firebase Storage
+  // Function to upload pitch to Firebase Storage
   const handlePitchUpload = () => {
     return new Promise((resolve, reject) => {
       if (!pitch) {
-        resolve(''); // Se não houver pitch para upload, retorna uma string vazia
+        resolve('');
         return;
       }
 
@@ -125,9 +139,12 @@ function CompanyForm() {
       const storageRefPitch = ref(storage, `pitches/${currentUser.uid}/${fileName}`);
       const uploadTaskPitch = uploadBytesResumable(storageRefPitch, pitch);
 
-      uploadTaskPitch.on('state_changed',
+      uploadTaskPitch.on(
+        'state_changed',
         (snapshot) => {
-          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
           setUploadProgressPitch(progress);
         },
         (error) => {
@@ -145,12 +162,12 @@ function CompanyForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); // Resetar erro antes de tentar novamente
+    setError('');
 
     let uploadedLogoURL = logoURL;
     let uploadedPitchURL = pitchURL;
 
-    // Upload do Logo
+    // Upload Logo
     if (logo) {
       try {
         uploadedLogoURL = await handleLogoUpload();
@@ -161,7 +178,7 @@ function CompanyForm() {
       }
     }
 
-    // Upload do Pitch
+    // Upload Pitch
     if (pitch) {
       try {
         uploadedPitchURL = await handlePitchUpload();
@@ -186,16 +203,20 @@ function CompanyForm() {
       pitchURL: uploadedPitchURL || '',
       founders: [currentUser.uid],
       allowedEditors: [currentUser.uid],
+      revenueIncome,
+      originState,
+      companieAge: parseInt(companieAge, 10),
+      website, // Include website in data object
     };
 
     try {
       await setDoc(doc(db, 'companies', currentUser.uid), data, { merge: true });
-      setCompanyData(data); // Atualiza o estado com os dados salvos
-      setIsFormVisible(false); // Oculta o formulário após o envio
-      setUploadProgressLogo(0); // Reseta o progresso do upload do logo
-      setUploadProgressPitch(0); // Reseta o progresso do upload do pitch
-      setLogo(null); // Reseta o logo selecionado
-      setPitch(null); // Reseta o pitch selecionado
+      setCompanyData(data);
+      setIsFormVisible(false);
+      setUploadProgressLogo(0);
+      setUploadProgressPitch(0);
+      setLogo(null);
+      setPitch(null);
       alert('Empresa salva com sucesso!');
     } catch (error) {
       console.error('Erro ao salvar a empresa:', error);
@@ -245,6 +266,17 @@ function CompanyForm() {
                 />
               </div>
 
+              {/* Website */}
+              <div className="form-group">
+                <label>Website:</label>
+                <input
+                  type="text"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  placeholder="https://"
+                />
+              </div>
+
               {/* Pitch da Empresa */}
               <div className="form-group">
                 <label>Pitch da Startup (PDF):</label>
@@ -258,6 +290,54 @@ function CompanyForm() {
                     Visualizar Pitch
                   </a>
                 )}
+              </div>
+
+              {/* Revenue Income */}
+              <div className="form-group">
+                <label>Modelo de Receita:</label>
+                <div className="checkbox-group">
+                  {revenueIncomeOptions.map((option) => (
+                    <label key={option} className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value={option}
+                        checked={revenueIncome.includes(option)}
+                        onChange={(e) => {
+                          const { value, checked } = e.target;
+                          setRevenueIncome(
+                            checked
+                              ? [...revenueIncome, value]
+                              : revenueIncome.filter((item) => item !== value)
+                          );
+                        }}
+                      />
+                      {option}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Origin State */}
+              <div className="form-group">
+                <label>Estado de Origem:</label>
+                <input
+                  type="text"
+                  value={originState}
+                  onChange={(e) => setOriginState(e.target.value)}
+                  required
+                />
+              </div>
+
+              {/* Company Age */}
+              <div className="form-group">
+                <label>Anos de Operação:</label>
+                <input
+                  type="number"
+                  value={companieAge}
+                  onChange={(e) => setCompanieAge(e.target.value)}
+                  required
+                  min="0"
+                />
               </div>
 
               {/* Número de Funcionários */}
@@ -357,31 +437,46 @@ function CompanyForm() {
                 />
               </div>
 
-              {/* Botão de Envio */}
+              {/* Funding Needed */}
+              <div className="form-group">
+                <label>Investimento Necessário:</label>
+                <input
+                  type="number"
+                  value={fundingNeeded}
+                  onChange={(e) => setFundingNeeded(e.target.value)}
+                  required
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+
+              {/* Submit Button */}
               <button type="submit" className="btn-primary">Salvar</button>
             </form>
           </>
         ) : (
           <div className="company-data-display">
             <CompanyCard company={companyData} onEdit={handleEditAgain} />
-            <button onClick={handleEditAgain} className="btn-primary">Editar</button>
+            <button onClick={handleEditAgain} className="btn-primary">
+              Editar
+            </button>
           </div>
         )}
-        {/* Exibir Progresso de Upload do Logo */}
+        {/* Upload Progress for Logo */}
         {uploadProgressLogo > 0 && uploadProgressLogo < 100 && (
           <div className="upload-progress">
             <p>Upload do Logo: {uploadProgressLogo}%</p>
             <progress value={uploadProgressLogo} max="100"></progress>
           </div>
         )}
-        {/* Exibir Progresso de Upload do Pitch */}
+        {/* Upload Progress for Pitch */}
         {uploadProgressPitch > 0 && uploadProgressPitch < 100 && (
           <div className="upload-progress">
             <p>Upload do Pitch: {uploadProgressPitch}%</p>
             <progress value={uploadProgressPitch} max="100"></progress>
           </div>
         )}
-        {/* Exibir Erros */}
+        {/* Display Errors */}
         {error && <p className="error-message">{error}</p>}
       </div>
     </div>
