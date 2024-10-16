@@ -114,7 +114,7 @@ function ImportInvestors() {
       await setDoc(doc(db, 'investors', userId), dataToSave, { merge: true });
 
       // Adicionar atraso de 1 segundo entre cada salvamento
-      await delay(1000);
+      await delay(100);
 
     } catch (error) {
       console.error('Erro ao criar usuário e salvar investidor:', error);
@@ -136,7 +136,7 @@ function ImportInvestors() {
         await createUserAndSaveInvestor(investor); // Criar usuário e salvar dados
 
         // Adicionar atraso de 5 segundos entre cada criação de usuário
-        await delay(5000);
+        await delay(3000);
       }
 
       alert('Todos os investidores foram salvos com sucesso!');
