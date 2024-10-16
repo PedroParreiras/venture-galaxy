@@ -24,7 +24,7 @@ function Signup() {
       // Redirect to the login page after successful signup
       navigate('/login');
     } catch (error) {
-      setError('Falha ao criar a conta');
+      navigate('/login');
     }
   };
 
