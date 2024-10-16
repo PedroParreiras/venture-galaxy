@@ -113,7 +113,7 @@ function HomePage() {
       </header>
 
       <main className="features-section">
-        <h2>O que é o Venture Galaxy?</h2>
+        <h2>O que é JUPTER?</h2>
         <div className="features">
           <div className="feature">
             <FontAwesomeIcon icon={faUsers} className="feature-icon" />
@@ -134,7 +134,7 @@ function HomePage() {
 
         {/* Displaying statistics */}
         <div className="stats-section">
-          <h2>Números do Venture Galaxy</h2>
+          <h2>Números de JUPTER</h2>
           <div className="stats">
             <div className="stats-column">
               <div className="stat-item">

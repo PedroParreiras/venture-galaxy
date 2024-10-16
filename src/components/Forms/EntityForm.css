@@ -23,11 +23,12 @@ html {
 /* Container for the entire form */
 .entity-form-container {
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;
   min-height: 100vh;
-  padding: 60px 20px;
-  background-color: var(--background-color);
+  width: 50%;
+  margin-left: 25%;
+  padding: 60px 20px ;
 }
 
 /* Main form styling */

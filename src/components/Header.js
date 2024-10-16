@@ -19,7 +19,7 @@ function Header() {
 
   return (
     <nav className="navbar">
-      <div className="logo">Venture Galaxy</div>
+      <div className="logo">JUPTER</div>
       <div className="nav-links">
         {currentUser ? (
           <>

@@ -15,13 +15,17 @@ function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    // Removed the try-catch block
     setError('');
-    // Create a new user with email and password
-    await signup(emailRef.current.value, passwordRef.current.value);
 
-    // Redirect to the dashboard immediately after successful signup
-    navigate('/dashboard');
+    try {
+      // Create a new user with email and password
+      await signup(emailRef.current.value, passwordRef.current.value);
+
+      // Redirect to the login page after successful signup
+      navigate('/login');
+    } catch (error) {
+      setError('Falha ao criar a conta');
+    }
   };
 
   return (
