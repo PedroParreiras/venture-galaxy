@@ -99,8 +99,8 @@ function HomePage() {
     <div className="homepage">
       <header className="hero-section">
         <div className="hero-content">
-          <h1>Conectando Fundadores e Investidores</h1>
-          <p>A plataforma ideal para conectar startups e investidores.</p>
+          <h1>Feito pela comunidade, para a comunidade</h1>
+          <p>Uma rede que se integra em um lugar só</p>
           <div className="hero-actions">
             <Link to="/signup" className="btn btn-primary">
               Cadastre-se Agora
@@ -118,12 +118,12 @@ function HomePage() {
           <div className="feature">
             <FontAwesomeIcon icon={faUsers} className="feature-icon" />
             <h3>Rede de Investidores</h3>
-            <p>Conecte-se com uma ampla rede de investidores em busca de oportunidades.</p>
+            <p>Conecte-se com uma ampla rede de investidores de todo o Brasil</p>
           </div>
           <div className="feature">
             <FontAwesomeIcon icon={faRocket} className="feature-icon" />
-            <h3>Crescimento Acelerado</h3>
-            <p>Impulsione suas conexões entre startups e investidores.</p>
+            <h3>Crescimento</h3>
+            <p>Impulsione suas conexões entre players.</p>
           </div>
           <div className="feature">
             <FontAwesomeIcon icon={faShieldAlt} className="feature-icon" />
